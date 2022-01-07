@@ -18,6 +18,9 @@ jobs:
       name: production
       url: https://graveyardnft.com
     steps:
+      - uses: hmarr/debug-action@v2
+      - name: 🧑‍💻 Checkout files
+        uses: actions/checkout@v2
       - name: 💻 Setup NodeJs & Yarn
         uses: actions/setup-node@v2
         with:
