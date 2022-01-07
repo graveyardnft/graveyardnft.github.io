@@ -64,3 +64,13 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
+      - name: 🚀 Update DNS with new IPFS hash
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: textileio/cloudflare-update-dnslink@v2
+        env:
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          RECORD_DOMAIN: 'graveyardnft.com'
+          RECORD_NAME: '_dnslink'
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        with:
+          cid: ${{ steps.web3.outputs.cid }}
