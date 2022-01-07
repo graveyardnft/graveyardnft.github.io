@@ -45,7 +45,8 @@ jobs:
           web3_token: ${{ secrets.WEB3_STORAGE_API_TOKEN }}
           path_to_add: 'dist'
       - name: 🚀 Deploy to Pinata
-        uses: aquiladev/ipfs-action@v0.1.3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: aquiladev/ipfs-action@v0.1.6
         id: pinata
         with:
           path: ./dist
