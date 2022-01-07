@@ -7,7 +7,16 @@ export default defineConfig({
   server: {
     https: true
   },
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    {
+      name: 'csp-dev-server',
+      apply: 'serve',
+      transformIndexHtml(html) {
+        return html.replace(/object-src 'none';/, `object-src 'none';connect-src wss://localhost:3000/`)
+      }
+    }
+  ],
   build: {
     sourcemap: true
   }
