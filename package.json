@@ -1,6 +1,7 @@
 {
   "name": "graveyardnft.github.io",
   "version": "1.0.0",
+  "license": "MIT",
   "keywords": [
     "vuejs",
     "ethereum",
@@ -22,7 +23,7 @@
     "tsc": "vue-tsc --noEmit",
     "build": "vite build",
     "preview": "vite preview",
-    "cid1": "cid base32"
+    "cid": "node cid"
   },
   "dependencies": {
     "vue": "^3.2.25"
@@ -30,7 +31,6 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.0.0",
     "autoprefixer": "^10.4.1",
-    "cid-tool": "^3.0.0",
     "ethers": "^5.5.2",
     "multiformats": "^9.5.8",
     "postcss": "^8.4.5",
