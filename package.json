@@ -1,0 +1,41 @@
+{
+  "name": "graveyardnft.github.io",
+  "version": "1.0.0",
+  "keywords": ["vuejs", "ethereum", "crypto", "nft"],
+  "description": "Graveyard NFT dApp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/graveyardnft/graveyardnft.github.io.git"
+  },
+  "homepage": "https://github.com/graveyardnft/graveyardnft.github.io",
+  "bugs": {
+    "url": "https://github.com/graveyardnft/graveyardnft.github.io/issues"
+  },
+  "scripts": {
+    "start": "yarn dev",
+    "dev": "vite",
+    "tsc": "vue-tsc --noEmit",
+    "build": "vite build",
+    "preview": "vite preview",
+    "cid1": "cid base32"
+  },
+  "dependencies": {
+    "vue": "^3.2.25"
+  },
+  "devDependencies": {
+    "@metamask/detect-provider": "^1.2.0",
+    "@metamask/providers": "^8.1.1",
+    "@vitejs/plugin-vue": "^2.0.0",
+    "autoprefixer": "^10.4.1",
+    "cid-tool": "^3.0.0",
+    "ethers": "^5.5.2",
+    "multiformats": "^9.5.8",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.11",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2",
+    "vue-router": "4",
+    "vue-tsc": "^0.29.8",
+    "web3": "^1.6.1"
+  }
+}

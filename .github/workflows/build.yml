@@ -1,0 +1,35 @@
+name: push
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.editorconfig'
+      - '.gitignore'
+      - README.md
+concurrency: actions-build-${{ github.ref }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://graveyardnft.com
+    steps:
+      - name: 💻 Setup NodeJs & Yarn
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: yarn
+      - name: 📦 Install dependencies
+        run: yarn install
+      - name: 👷 Build applications
+        run: yarn build
+      - name: 🚀 Deploy to pages
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: pages
