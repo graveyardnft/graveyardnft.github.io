@@ -9,6 +9,13 @@
         <button type="button" @click="connect()">Connect</button>
       </div>
       <router-view v-else />
+      <div v-if="ipfs.hash" class="text-center p-4">
+        <p>This dApp is also deployed using IPFS decentralised storage and can be found at</p>
+        <p>https://{{ ipfs.domain }}.link</p>
+        <p>https://{{ ipfs.base32 }}.ipfs.dweb.link</p>
+        <p>ipfs://{{ ipfs.base32 }}</p>
+        <p>ipfs://{{ ipfs.cid }}</p>
+      </div>
       <div v-if="error" class="fixed bottom-0 w-full">
         <div class="w-5/6 mx-auto pb-12 flex justify-center">
           <div class="max-w-full px-5 py-4 flex items-center justify-center bg-red-500 text-sm text-white rounded-md">
