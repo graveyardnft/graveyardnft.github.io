@@ -32,10 +32,11 @@ jobs:
         run: yarn build
       - name: 🚀 Deploy to Swarm
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: aquiladev/swarm-action@v0.1
+        uses: aquiladev/swarm-action@v0.1.1
         id: swarm
         with:
           path: ./dist
+          verbose: true
       - name: 🚀 Deploy to Web3
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: web3-storage/add-to-web3@v2
