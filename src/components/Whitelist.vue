@@ -36,32 +36,30 @@ import wl from '../whitelist.json'
 
 const router = useRouter()
 
-const account = inject('account', null)
-const ensName = inject('ensName', null)
-const contract = inject('contract')
-const stage = inject('stage')
-const success = inject('success')
-const etherscanUrl = inject('etherscanUrl')
+const account = inject<string|null>('account', null)
+const ensName = inject<string|null>('ensName', null)
+const contract = inject<ethers.Contract>('contract')
+const stage = inject<number>('stage')
 
 const whitelisted = ref<string[]>([])
 const isWhitelisted = computed(() => {
   if (stage.value < 2) return whitelisted.value.includes(account.value)
   return Object.keys(wl.proofs).map(a => a.toLowerCase()).includes(account.value)
 })
-const proofs = computed(() => Object.entried(wl.proofs).find(([address]) => address.toLowerCase() == account.value)[1] || [])
+const proofs = computed(() => Object.entries(wl.proofs).find(([address]) => address.toLowerCase() == account.value)[1] || [])
 
 const loadWhitelist = async (contract: ethers.Contract) => {
   whitelisted.value = (await contract.queryFilter(contract.filters.Committed(), (await contract.CREATION_BLOCK()).toNumber()))
     .map((event: any) => event.args.from.toLowerCase())
     .filter((value, index, self) => self.indexOf(value) === index)
     .slice(0, 2000);
-  console.debug(whitelisted.value);
+  console.debug('whitelist', whitelisted.value);
   if (whitelisted.value.length < 2000) {
-    contract.on(contract.filters.Committed(), from => {
+    contract.on(contract.filters.Committed(), (from, contractAddress, tokenId, data) => {
       if (!whitelisted.value.includes(from)) {
         whitelisted.value.push(from.toLowerCase());
       }
-      console.debug(from);
+      console.debug('whitelist event', from, contractAddress, tokenId, data);
     })
   }
 }

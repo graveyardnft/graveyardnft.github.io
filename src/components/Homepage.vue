@@ -1,4 +1,5 @@
 <template>
+  <div>The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</div>
   <div v-if="stage === 0">
     Hello intro yadiyada
   </div>

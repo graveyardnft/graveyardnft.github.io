@@ -62,7 +62,12 @@ const commit = async (contractAddress: string, tokenId: number, data: string) =>
   committing.value = true
   transaction.value = null
   receipt.value = null
-  transaction.value = await contract.safeTransferFrom(props.account, props.graveyardAddress, tokenId, ethers.utils.toUtf8Bytes(data))
+  try {
+    transaction.value = await contract.safeTransferFrom(props.account, props.graveyardAddress, tokenId, ethers.utils.toUtf8Bytes(data))
+  } catch (e) {
+    reset()
+    throw e
+  }
   console.debug('transaction', transaction.value)
   receipt.value = await transaction.value.wait()
   console.debug('receipt', receipt.value)
