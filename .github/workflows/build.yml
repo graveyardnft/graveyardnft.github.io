@@ -29,7 +29,7 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
       - name: 👷 Build applications
-        run: yarn build
+        run: yarn build && cp dist/index.html dist/404.html
       - name: 🚀 Deploy to Swarm
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: aquiladev/swarm-action@v0.1.1
