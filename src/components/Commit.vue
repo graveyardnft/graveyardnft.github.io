@@ -1,7 +1,7 @@
 <template>
-  <input type="text" v-model="contractAddress" placeholder="Enter contract address" />
-  <input type="number" v-model="tokenId" placeholder="Enter tokenId" />
-  <input type="text" v-model="data" placeholder="Last rites" />
+  <input v-model="contractAddress" type="text" placeholder="Enter contract address" />
+  <input v-model="tokenId" type="number" min="1" max="3" placeholder="Enter tokenId" />
+  <input v-model="data" type="text" placeholder="Last rites" />
   <button type="button" @click="commit(contractAddress, tokenId, data)">Commit token to the graveyard</button>
   <Modal v-if="committing" @close="reset">
     <template #header>

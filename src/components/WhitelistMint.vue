@@ -1,6 +1,6 @@
 <template>
   Max 3 per wallet
-  <input type="number" v-model="qty" placeholder="Number of CRYPTs" />
+  <input v-model="qty" type="number" min="1" max="3" placeholder="Number of CRYPTs" />
   <button type="button" @click="mint(qty, proofs)">Mint</button>
   <Modal v-if="minting" @close="reset">
     <template #header>
