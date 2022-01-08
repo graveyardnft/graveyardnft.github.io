@@ -134,19 +134,21 @@ export default defineComponent({
     const updateAccounts = async (newAccounts: string[]) => {
       if (newAccounts[0] === accounts.value[0]) return
       accounts.value = newAccounts
-      console.debug(accounts.value)
+      console.debug('accounts', accounts.value)
       if (account.value && network.value?.chainId === 1) {
         ensName.value = await provider.lookupAddress(account.value)
-        console.debug(ensName.value)
+        console.debug('ens name', ensName.value)
       }
     }
 
     const updateMinted = async () => {
-      minted.value = await contract.value.totalSupply()
+      minted.value = (await contract.value.totalSupply()).toNumber()
+      console.debug('minted', minted.value)
     }
 
     const updateStage = async () => {
       stage.value = (await contract.value._releaseStage()).toNumber()
+      console.debug('stage', stage.value)
     }
 
     const updateIpfs = async () => {
@@ -158,13 +160,13 @@ export default defineComponent({
         ipfs.value.cid = cid.toV0().toString()
         ipfs.value.base32 = cid.toV1().toString()
       }
-      console.log(ipfs.value)
+      console.debug('ipfs', ipfs.value)
     }
 
     if (provider) {
       provider.getNetwork().then(net => {
         network.value = net
-        console.debug(net)
+        console.debug('network', network.value)
         provider.provider.request({ method: 'eth_accounts' }).then(updateAccounts)
       })
 
@@ -189,7 +191,8 @@ export default defineComponent({
     watchEffect(async () => {
       if (isConnected.value && contract.value) {
         updateIpfs()
-        maxSupply.value = await contract.value.MAX_SUPPLY()
+        maxSupply.value = (await contract.value.MAX_SUPPLY()).toNumber()
+        console.debug('maxSupply', maxSupply.value)
         updateStage()
         updateMinted()
         contract.value.on(contract.value.filters.ReleaseStage(), updateStage)

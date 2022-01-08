@@ -5,19 +5,13 @@
   <div v-else-if="stage === 1">
     <a href="#" @click.prevent="router.push({ name: 'whitelist' })">Whitelist</a>
   </div>
-  <div v-else-if="stage === 2">
-    <a href="#" @click.prevent="router.push({ name: 'whitelist' })">Whitelist Mint</a>
-  </div>
-  <div v-else-if="stage >= 3">
-    <template v-if="minted < maxSupply">
-      {{ minted }}/{{ maxSupply }} Minted
-      <a href="#" @click.prevent="router.push({ name: 'whitelist' })">Whitelist Mint</a>
-      <a href="#" @click.prevent="router.push({ name: 'mint' })">Mint</a>
+  <div v-else-if="stage >= 2">
+    <template v-if="minted <= maxSupply">
+      {{ minted }}/{{ maxSupply }} Minted<br/>
+      <a v-if="stage === 2" href="#" @click.prevent="router.push({ name: 'whitelist' })">Whitelist Mint</a><br/>
+      <a v-if="stage >= 3" href="#" @click.prevent="router.push({ name: 'mint' })">Mint</a><br/>
     </template>
-    <template v-else>
-      MINTED OUT! buy on opensea link here {{ minted }}
-    </template>
-    <a href="#" @click.prevent="router.push({ name: 'crypts' })">View CRYPTs</a>
+    <a v-if="minted > 0" href="#" @click.prevent="router.push({ name: 'crypts' })">View CRYPTs</a>
   </div>
 </template>
 

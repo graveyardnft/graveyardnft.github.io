@@ -18,30 +18,41 @@
       <input type="text" v-model="commit.data" placeholder="Last rites" />
       <button type="button" @click="whitelist(contract)">Commit token to the graveyard</button>
     </div>
-    <pre>
-      {{ isWhitelisted ? 'whitelisted' : 'not on whitelist' }}
-      {{ whitelisted }}
-    </pre>
+  </div>
+  <div v-else-if="stage === 2">
+    <template v-if="isWhitelisted">
+      <div v-if="isWhitelisted">
+        Congratulations!
+        {{ ensName || account }}
+        Is whitelisted!
+      </div>
+      Max 3 per wallet
+      <input type="number" v-model="qty" placeholder="Number of CRYPTs" />
+      <button type="button" @click="whitelistMint(contract, qty)">Mint</button>
+      <Modal v-if="minting" @close="() => { minting = false;transaction = null;receipt = null; }">
+        <template #header>
+          Minting CRYPTs
+        </template>
+        <div class="flex items-center justify-center my-4">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="fill-current w-10 h-10">
+            <path d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
+              <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50" to="360 50 50" repeatCount="indefinite" />
+            </path>
+          </svg>
+          <span v-if="!transaction">Waiting for signature</span>
+          <a v-else-if="!receipt" :href="`${etherscanUrl}/tx/${transaction?.hash}`" target="_blank" rel="noopener">View Transaction</a>
+          <div v-else-if="receipt">
+            {{ receipt.logs }}
+          </div>
+        </div>
+      </Modal>
+    </template>
+    <div v-else>
+      {{ ensName || account }} is not on the whitelist, join us on discord for announcements on the public sale
+    </div>
   </div>
   <div v-else>
-    {{ ensName || account }}
-    {{ isWhitelisted ? 'whitelisted' : 'not on whitelist' }}
-    Max mints per wallet 3
-    <input type="number" v-model="qty" placeholder="Number of CRYPTs" />
-    <button type="button" @click="whitelistMint(contract, qty)">Mint</button>
-    <Modal v-if="minting && transaction || true" @close="minting = false">
-      <template #header>
-        Minting CRYPTs
-      </template>
-      <div class="flex items-center justify-center my-4">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="fill-current w-10 h-10">
-          <path d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
-            <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50" to="360 50 50" repeatCount="indefinite" />
-          </path>
-        </svg>
-        <a :href="`${etherscanUrl}/tx/${transaction?.hash}`" target="_blank" rel="noopener">View Transaction</a>
-      </div>
-    </Modal>
+    Whitelist minting event finished
   </div>
 </template>
 
@@ -76,6 +87,7 @@ const commit = reactive({
 
 const qty = ref(1)
 const transaction = ref(null)
+const receipt = ref(null)
 const minting = ref(false)
 const whitelisting = ref(false)
 
@@ -101,6 +113,7 @@ const whitelist = async (contract: ethers.Contract) => {
   if (commit.tokenId === 0) throw new Error('Enter NFT tokenId');
 
   const c = getContract(commit.contract, [
+    'function symbol() view returns (string)',
     'function ownerOf(uint256 tokenId) view returns (address)',
     'function safeTransferFrom(address from, address to, uint256 tokenId, bytes data)'
   ])
@@ -111,30 +124,35 @@ const whitelist = async (contract: ethers.Contract) => {
   }
 
   try {
+    const symbol = await c.symbol()
     whitelisting.value = true
+    transaction.value = null
     transaction.value = await c.safeTransferFrom(account.value, contract.address, parseInt(commit.tokenId), ethers.utils.toUtf8Bytes(commit.data))
     await transaction.value.wait()
+    success(`${symbol} ${commit.tokenId} committed to the graveyard.`)
   } catch (e) {
     throw e
   } finally {
     whitelisting.value = false
+    transaction.value = null
   }
 }
 
 const whitelistMint = async (contract: ethers.Contract, qty: number) => {
-  if (qty > 3) throw new Error('Maximum 1-3 per wallet!')
+  if (qty > 3) throw new Error('Maximum 3 per wallet!')
   const merkle = Object.entries(wl.proofs).find(([a]) => a.toLowerCase() === account.value)
   if (!merkle) throw new Error('Wallet not whitelisted!')
 
   try {
     minting.value = true
+    transaction.value = null
+    receipt.value = null
     transaction.value = await contract.whitelistMint(qty, merkle[1], { value: ethers.utils.parseEther('0.025').mul(qty) })
-    await transaction.value.wait()
-    success(`Mint complete`)
+    receipt.value = await transaction.value.wait()
+    if (receipt.value.status !== 1) throw new Error('Transaction Reverted!')
+    success(`Mint complete.`)
   } catch (e) {
     throw e
-  } finally {
-    minting.value = false
   }
 }
 
