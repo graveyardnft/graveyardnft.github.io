@@ -5,26 +5,17 @@
   <div v-else-if="stage === 1">
     <div>Committed to the whitelist {{ whitelisted.length }}/2000</div>
     <div v-if="isWhitelisted">
-      Congratulations!
-      {{ ensName || account }}
-      Is whitelisted!
+      Congratulations! {{ ensName || account }} Is whitelisted!
     </div>
     <div v-else-if="whitelisted.length >= 2000">
       Whitelist full, join us on discord for announcements on the public sale
     </div>
-    <div v-else>
-      <input type="text" v-model="commit.contract" placeholder="Enter contract address" />
-      <input type="number" v-model="commit.tokenId" placeholder="Enter tokenId" />
-      <input type="text" v-model="commit.data" placeholder="Last rites" />
-      <button type="button" @click="whitelist(contract)">Commit token to the graveyard</button>
-    </div>
+    <Commit v-else :account="account" :graveyardAddress="contract.address" />
   </div>
   <div v-else-if="stage === 2">
     <template v-if="isWhitelisted">
-      <div v-if="isWhitelisted">
-        Congratulations!
-        {{ ensName || account }}
-        Is whitelisted!
+      <div>
+        Congratulations! {{ ensName || account }} Is whitelisted!
       </div>
       Max 3 per wallet
       <input type="number" v-model="qty" placeholder="Number of CRYPTs" />
@@ -51,18 +42,15 @@
       {{ ensName || account }} is not on the whitelist, join us on discord for announcements on the public sale
     </div>
   </div>
-  <div v-else>
-    Whitelist minting event finished
-  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, inject, watchEffect } from 'vue'
+import { ref, computed, inject, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
-import { getContract } from '../utils'
-import wl from '../whitelist.json'
 import Modal from './Modal.vue'
+import Commit from './Commit.vue'
+import wl from '../whitelist.json'
 
 const router = useRouter()
 
@@ -75,21 +63,14 @@ const etherscanUrl = inject('etherscanUrl')
 
 const whitelisted = ref<string[]>([])
 const isWhitelisted = computed(() => {
-  if (stage.value < 3) return whitelisted.value.includes(account.value)
+  if (stage.value < 2) return whitelisted.value.includes(account.value)
   return Object.keys(wl.proofs).map(a => a.toLowerCase()).includes(account.value)
-})
-
-const commit = reactive({
-  contract: '',
-  tokenId: 0,
-  data: ''
 })
 
 const qty = ref(1)
 const transaction = ref(null)
 const receipt = ref(null)
 const minting = ref(false)
-const whitelisting = ref(false)
 
 const loadWhitelist = async (contract: ethers.Contract) => {
   whitelisted.value = (await contract.queryFilter(contract.filters.Committed(), (await contract.CREATION_BLOCK()).toNumber()))
@@ -100,41 +81,10 @@ const loadWhitelist = async (contract: ethers.Contract) => {
   if (whitelisted.value.length < 2000) {
     contract.on(contract.filters.Committed(), from => {
       if (!whitelisted.value.includes(from)) {
-        whitelisted.value++;
+        whitelisted.value.push(from.toLowerCase());
       }
       console.debug(from);
     })
-  }
-}
-
-const whitelist = async (contract: ethers.Contract) => {
-  if (commit.contract === '') throw new Error('Enter the NFT contract address of the token you would like to commit.');
-  if (!ethers.utils.isAddress(commit.contract)) throw new Error('Invalid contract address entered.')
-  if (commit.tokenId === 0) throw new Error('Enter NFT tokenId');
-
-  const c = getContract(commit.contract, [
-    'function symbol() view returns (string)',
-    'function ownerOf(uint256 tokenId) view returns (address)',
-    'function safeTransferFrom(address from, address to, uint256 tokenId, bytes data)'
-  ])
-  try {
-    if (await c.ownerOf(commit.tokenId) !== account.value) throw new Error('You must be the owner the tokenId being transferred.');
-  } catch (e) {
-    throw new Error('Contract address invalid, not a ERC721 token contract.')
-  }
-
-  try {
-    const symbol = await c.symbol()
-    whitelisting.value = true
-    transaction.value = null
-    transaction.value = await c.safeTransferFrom(account.value, contract.address, parseInt(commit.tokenId), ethers.utils.toUtf8Bytes(commit.data))
-    await transaction.value.wait()
-    success(`${symbol} ${commit.tokenId} committed to the graveyard.`)
-  } catch (e) {
-    throw e
-  } finally {
-    whitelisting.value = false
-    transaction.value = null
   }
 }
 
@@ -157,10 +107,10 @@ const whitelistMint = async (contract: ethers.Contract, qty: number) => {
 }
 
 watchEffect(async () => {
-  if (stage.value >= 4) {
+  if (stage.value > 2) {
     router.push({ name: 'home' })
-    return
+  } else {
+    loadWhitelist(contract.value)
   }
-  loadWhitelist(contract.value)
 })
 </script>
