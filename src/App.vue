@@ -78,6 +78,10 @@ export default defineComponent({
     ensDomain: {
       type: String,
       required: true
+    },
+    openSea: {
+      type: String,
+      required: true
     }
   },
   setup(props) {
@@ -111,6 +115,7 @@ export default defineComponent({
       if (timeout) clearTimeout(timeout)
       timeout = window.setTimeout(() => (success.value = null), 5000)
     })
+    provide('openSea', props.openSea)
     provide('provider', provider)
     provide('web3', web3)
     provide('network', network)
