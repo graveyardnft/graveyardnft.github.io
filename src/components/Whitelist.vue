@@ -39,7 +39,7 @@
             <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50" to="360 50 50" repeatCount="indefinite" />
           </path>
         </svg>
-        <a :href="`${etherscanUrl}/tx/${transaction?.hash}`" target="_blank">View Transaction</a>
+        <a :href="`${etherscanUrl}/tx/${transaction?.hash}`" target="_blank" rel="noopener">View Transaction</a>
       </div>
     </Modal>
   </div>
