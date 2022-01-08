@@ -17,26 +17,7 @@
       <div>
         Congratulations! {{ ensName || account }} Is whitelisted!
       </div>
-      Max 3 per wallet
-      <input type="number" v-model="qty" placeholder="Number of CRYPTs" />
-      <button type="button" @click="whitelistMint(contract, qty)">Mint</button>
-      <Modal v-if="minting" @close="() => { minting = false;transaction = null;receipt = null; }">
-        <template #header>
-          Minting CRYPTs
-        </template>
-        <div class="flex items-center justify-center my-4">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="fill-current w-10 h-10">
-            <path d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
-              <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50" to="360 50 50" repeatCount="indefinite" />
-            </path>
-          </svg>
-          <span v-if="!transaction">Waiting for signature</span>
-          <a v-else-if="!receipt" :href="`${etherscanUrl}/tx/${transaction?.hash}`" target="_blank" rel="noopener">View Transaction</a>
-          <div v-else-if="receipt">
-            {{ receipt.logs }}
-          </div>
-        </div>
-      </Modal>
+      <WhitelistMint :account="account" :proofs="proofs" />
     </template>
     <div v-else>
       {{ ensName || account }} is not on the whitelist, join us on discord for announcements on the public sale
@@ -50,6 +31,7 @@ import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import Modal from './Modal.vue'
 import Commit from './Commit.vue'
+import WhitelistMint from './WhitelistMint.vue'
 import wl from '../whitelist.json'
 
 const router = useRouter()
@@ -66,11 +48,7 @@ const isWhitelisted = computed(() => {
   if (stage.value < 2) return whitelisted.value.includes(account.value)
   return Object.keys(wl.proofs).map(a => a.toLowerCase()).includes(account.value)
 })
-
-const qty = ref(1)
-const transaction = ref(null)
-const receipt = ref(null)
-const minting = ref(false)
+const proofs = computed(() => Object.entried(wl.proofs).find(([address]) => address.toLowerCase() == account.value)[1] || [])
 
 const loadWhitelist = async (contract: ethers.Contract) => {
   whitelisted.value = (await contract.queryFilter(contract.filters.Committed(), (await contract.CREATION_BLOCK()).toNumber()))
@@ -85,24 +63,6 @@ const loadWhitelist = async (contract: ethers.Contract) => {
       }
       console.debug(from);
     })
-  }
-}
-
-const whitelistMint = async (contract: ethers.Contract, qty: number) => {
-  if (qty > 3) throw new Error('Maximum 3 per wallet!')
-  const merkle = Object.entries(wl.proofs).find(([a]) => a.toLowerCase() === account.value)
-  if (!merkle) throw new Error('Wallet not whitelisted!')
-
-  try {
-    minting.value = true
-    transaction.value = null
-    receipt.value = null
-    transaction.value = await contract.whitelistMint(qty, merkle[1], { value: ethers.utils.parseEther('0.025').mul(qty) })
-    receipt.value = await transaction.value.wait()
-    if (receipt.value.status !== 1) throw new Error('Transaction Reverted!')
-    success(`Mint complete.`)
-  } catch (e) {
-    throw e
   }
 }
 
