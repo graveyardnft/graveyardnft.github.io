@@ -36,7 +36,7 @@ const props = defineProps({
 
 const success = inject<(msg: string) => {}>('success')
 const contractAddress = ref('')
-const tokenId = ref(0)
+const tokenId = ref<number|null>(null)
 const data = ref('')
 const committing = ref(false)
 const transaction = ref(null)
