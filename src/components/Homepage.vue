@@ -1,24 +1,27 @@
 <template>
-  <div>The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</div>
-  <div v-if="stage === 0">
-    Join our discord to stay up to date on news and announcements
-  </div>
-  <div v-else-if="stage === 1">
-    <a href="#" @click.prevent="router.push({ name: 'whitelist' })">Whitelist</a>
-  </div>
-  <div v-else-if="stage >= 2">
-    <template v-if="minted <= maxSupply">
-      {{ minted }}/{{ maxSupply }} Minted<br/>
-      <a v-if="stage === 2" href="#" @click.prevent="router.push({ name: 'whitelist' })">Whitelist Mint</a><br/>
-      <a v-if="stage >= 3" href="#" @click.prevent="router.push({ name: 'mint' })">Mint</a><br/>
-    </template>
-    <a v-if="minted > 0" :href="openSea">View CRYPTs on OpenSea</a>
+  <div class="container mx-auto flex-col py-32 text-center">
+    <h1 class="text-5xl leading-snug">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</h1>
+    <h2 class="text-md">Join our discord to stay up to date on news and announcements.</h2>
+    <div class="flex items-center justify-center my-8">
+      <Button v-if="stage === 1" @click="router.push({ name: 'whitelist' })" class="mx-2">Whitelist</Button>
+      <Button class="mx-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
+    </div>
+    <div v-if="stage >= 2">
+      <div class="text-5xl leading-snug my-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
+      <template v-if="minted <= maxSupply">
+        <div class="flex items-center justify-center">
+          <Button v-if="stage === 2" class="mx-2" @click="router.push({ name: 'whitelist' })">Whitelist Mint</Button>
+          <Button v-else class="mx-2" @click="router.push({ name: 'mint' })">Mint</Button>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { inject } from 'vue'
 import { useRouter } from 'vue-router'
+import Button from './Button.vue'
 
 const router = useRouter()
 

@@ -1,20 +1,23 @@
 <template>
   <template v-if="isWeb3">
-    <div v-if="!isMainNet" class="sticky top-0 w-full p-2 text-center text-sm bg-yellow-300">
+    <div v-if="!isMainNet" class="sticky top-0 p-2 text-center text-sm text-gray-900 bg-yellow-300">
       <code>{{ isRinkeby ? `Ethereum Testnet: ${network.name}` : `Unsupported Network: ${network.name} chainId:${network.chainId}` }}</code>
     </div>
     <Menu />
-    <div class="top-0 text-center">
-      <div v-if="$route.meta.web3 && (!isConnected || !contract)">
-        <button type="button" @click="connect()">Connect</button>
+    <div class="top-0">
+      <div v-if="$route.meta.web3 && (!isConnected)" class="container mx-auto flex-col py-32 text-center">
+        <h1 class="text-5xl leading-snug">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</h1>
+        <h2 class="text-md">Join our discord to stay up to date on news and announcements.</h2>
+        <div class="flex items-center justify-center my-8">
+          <Button class="mx-2" @click="connect()">Connect</button>
+          <Button class="mx-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
+        </div>
       </div>
       <router-view v-else />
-      <div v-if="ipfs.hash" class="text-center p-4">
-        <p>This dApp is also deployed using IPFS decentralised storage and can be found at</p>
-        <p>https://{{ ipfs.domain }}.link</p>
-        <p>https://{{ ipfs.base32 }}.ipfs.dweb.link</p>
-        <p>ipfs://{{ ipfs.base32 }}</p>
-        <p>ipfs://{{ ipfs.cid }}</p>
+      <div v-if="ipfs.hash" class="container mx-auto mt-10 py-10 text-center text-xs border-t border-t-gray-300">
+        <p>This dApp is also deployed using IPFS decentralised storage and can be found at:</p>
+        <a :href="`https://${ipfs.domain}.link`" target="_blank" rel="noopener" class="hover:text-gray-900 px-4">https://{{ ipfs.domain }}.link</a>
+        <a :href="`ipfs://${ipfs.base32}`" target="_blank" rel="noopener" class="hover:text-gray-900 px-4">ipfs://{{ ipfs.base32 }}</a>
       </div>
       <div v-if="error" class="fixed bottom-0 w-full">
         <div class="w-5/6 mx-auto pb-12 flex justify-center">
@@ -36,37 +39,34 @@
           </div>
         </div>
       </div>
-      <pre class="border-t pt-10" style="margin-top: 800px;">
-        hello
-        ens: {{ ensName }}
-        short: {{ shortAccount }}
-        address: {{ account }}
-        supply: {{ maxSupply }}
-        stage: {{ stage }}
-        minted: {{ minted }}
-        ipfs: {{ ipfs }}
-      </pre>
     </div>
   </template>
   <template v-else>
     <Menu />
     <router-view v-if="!$route.meta.web3" />
-    <div v-else class="text-center">
-      Use a web3 connected browser to access The Graveyard NFT Project
+    <div v-else class="container mx-auto flex-col py-32 text-center">
+      <h1 class="text-5xl leading-snug">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</h1>
+      <h2 class="text-md">Join our discord to stay up to date on news and announcements.</h2>
+      <h1 class="text-3xl my-8">Use a web3 connected browser to access The Graveyard NFT Project</h1>
+      <div class="flex items-center justify-center my-8">
+        <Button class="mx-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
+      </div>
     </div>
   </template>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, provide, onErrorCaptured, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { CID } from 'multiformats/cid'
 import { getContract } from './utils'
 import abi from './abi.json'
-import Menu from "./components/Menu.vue";
+import Menu from './components/Menu.vue'
+import Button from './components/Button.vue'
 
 export default defineComponent({
-  components: { Menu },
+  components: { Menu, Button },
   props: {
     provider: {
       type: ethers.providers.Web3Provider
@@ -104,7 +104,7 @@ export default defineComponent({
     const isConnected = computed<boolean>(() => !!account.value && (isMainNet.value || isRinkeby.value))
     const etherscanUrl = computed(() => `https://${isRinkeby.value ? 'rinkeby.' : ''}etherscan.io`)
     const contractAddress = computed<string>(() => props.contractAddresses[isConnected.value ? network.value.chainId : 1])
-    const contract = computed<ethers.Contract|null>(() => isConnected.value ? getContract(props.contractAddresses[network.value.chainId], abi) : null)
+    const contract = computed<ethers.Contract|null>(() => isConnected.value && props.contractAddresses[network.value.chainId] ? getContract(props.contractAddresses[network.value.chainId], abi) : null)
     const maxSupply = ref(0)
     const stage = ref(0)
     const minted = ref(0)
@@ -223,7 +223,8 @@ export default defineComponent({
       success,
       error,
       clearError: () => (error.value =  null),
-      clearSuccess: () => (success.value = null)
+      clearSuccess: () => (success.value = null),
+      router: useRouter()
     }
   }
 })

@@ -1,27 +1,19 @@
 <template>
-  <div v-if="stage === 0">
-    Whitelisting is not currently activated
-  </div>
-  <div v-else-if="stage === 1">
-    <div>Committed to the whitelist {{ whitelisted.length }}/2000</div>
-    <div v-if="isWhitelisted">
-      Congratulations! {{ ensName || account }} Is whitelisted!
-    </div>
-    <div v-else-if="whitelisted.length >= 2000">
-      Whitelist full, join us on discord for announcements on the public sale
-    </div>
+  <div v-if="stage === 1" class="container mx-auto py-32 text-center">
+    <h1 class="text-5xl leading-snug mb-4">Whitelisted {{ whitelisted.length }}/2000</h1>
+    <h2 v-if="isWhitelisted" class="text-xl">Congratulations! {{ ensName || account }} Is whitelisted!</h2>
+    <h3 v-else-if="whitelisted.length >= 2000" class="text-xl">
+      Whitelist full, join us on discord for announcements on the public sale.
+    </h3>
     <Commit v-else :account="account" :graveyardAddress="contract.address" />
   </div>
-  <div v-else-if="stage === 2">
+  <div v-else-if="stage === 2" class="container mx-auto py-32 text-center">
+    <div class="text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
     <template v-if="isWhitelisted">
-      <div>
-        Congratulations! {{ ensName || account }} Is whitelisted!
-      </div>
+      <h2 class="text-xl">Congratulations! {{ ensName || account }} Is whitelisted!</h2>
       <WhitelistMint :account="account" :proofs="proofs" />
     </template>
-    <div v-else>
-      {{ ensName || account }} is not on the whitelist, join us on discord for announcements on the public sale
-    </div>
+    <h2 v-else class="text-xl">{{ ensName || account }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
   </div>
 </template>
 
@@ -40,6 +32,8 @@ const account = inject<string|null>('account', null)
 const ensName = inject<string|null>('ensName', null)
 const contract = inject<ethers.Contract>('contract')
 const stage = inject<number>('stage')
+const minted = inject<number>('minted')
+const maxSupply = inject<number>('maxSupply')
 
 const whitelisted = ref<string[]>([])
 const isWhitelisted = computed(() => {
@@ -65,7 +59,7 @@ const loadWhitelist = async (contract: ethers.Contract) => {
 }
 
 watchEffect(async () => {
-  if (stage.value > 2) {
+  if (![1,2].includes(stage.value)) {
     router.push({ name: 'home' })
   } else {
     loadWhitelist(contract.value)

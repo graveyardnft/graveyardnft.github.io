@@ -1,8 +1,10 @@
 <template>
-  <input v-model="contractAddress" type="text" placeholder="Enter contract address" />
-  <input v-model="tokenId" type="number" min="1" max="3" placeholder="Enter tokenId" />
-  <input v-model="data" type="text" placeholder="Last rites" />
-  <button type="button" @click="commit(contractAddress, tokenId, data)">Commit token to the graveyard</button>
+  <div class="flex flex-col w-96 max-w-full mx-auto p-8 bg-gray-600/90 rounded border-4 border-gray-700">
+    <input v-model="contractAddress" type="text" class="mb-2 p-2 rounded text-2xl bg-transparent text-center text-slate-800 placeholder:text-slate-800  outline-none focus:ring ring-slate-800/25" placeholder="Enter contract address" />
+    <input v-model="tokenId" type="number" class="mb-2 p-2 rounded text-2xl bg-transparent text-center text-slate-800 placeholder:text-slate-800  outline-none focus:ring ring-slate-800/25" placeholder="Enter tokenId" />
+    <input v-model="data" type="text" class="mb-6 p-2 rounded text-2xl bg-transparent text-center text-slate-800 placeholder:text-slate-800  outline-none focus:ring ring-slate-800/25" placeholder="Last rites" />
+    <Button @click="commit(contractAddress, tokenId, data)">Commit To The Graveyard</Button>
+  </div>
   <Modal v-if="committing" @close="reset">
     <template #header>
       Transferring Token To The Graveyard
@@ -19,6 +21,7 @@ import { ethers } from 'ethers'
 import { getContract } from '../utils'
 import Modal from './Modal.vue'
 import Transaction from './Transaction.vue'
+import Button from './Button.vue'
 
 const props = defineProps({
   account: {

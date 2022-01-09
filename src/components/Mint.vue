@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { inject, ref, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import Modal from './Modal.vue'
 import Transaction from './Transaction.vue'
@@ -24,6 +25,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const router = useRouter()
 
 const stage = inject<number>('stage')
 const contract = inject<ethers.Contract>('contract')
