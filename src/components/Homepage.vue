@@ -7,6 +7,7 @@
       <Button class="m-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
       <Button v-if="stage >= 2" class="m-2" @click="addUrn">Add URN Token</Button>
       <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'commit' })">Committal</Button>
+<!--      <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'crypts' })">View CRYPT's</Button>-->
     </div>
     <div v-if="stage >= 2 && minted <= maxSupply">
       <div class="text-3xl md:text-5xl leading-snug my-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
