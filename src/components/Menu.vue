@@ -1,6 +1,9 @@
 <template>
   <menu class="p-8 flex flex-col md:flex-row items-center content-center text-white">
-    <a href="/" @click.prevent="router.push({ name: 'home' })" class="font-semibold text-5xl">Graveyard NFT</a>
+    <a href="/" @click.prevent="router.push({ name: 'home' })" class="font-semibold text-4xl flex items-center">
+      <img src="/logo.svg" class="w-12 h-12 mr-4" />
+      Graveyard NFT
+    </a>
     <div class="md:ml-auto flex items-center justify-center mt-4 md:mt-0">
       <a href="https://twitter.com/Graveyard_NFT_" target="_blank" rel="noopener" title="Twitter" class="mr-4">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 fill-current hover:fill-blue-400">
