@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
+  <div v-if="stage >= 3" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <div class="text-3xl md:text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
     <div class="flex flex-col w-96 max-w-full mx-auto p-8 bg-gray-600/90 rounded border-4 border-gray-700">
       <h3 v-if="minted === maxSupply" class="text-5xl text-center leading-snug text-slate-800">SOLD OUT</h3>
@@ -31,17 +31,17 @@
       </div>
     </Modal>
   </div>
+  <div v-else class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
+    <h2 class="text-5xl">Minting inactive.</h2>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
+import { inject, ref } from 'vue'
 import { ethers } from 'ethers'
 import Modal from './Modal.vue'
 import Transaction from './Transaction.vue'
 import Button from './Button.vue'
-
-const router = useRouter()
 
 const stage = inject<number>('stage')
 const contract = inject<ethers.Contract>('contract')
@@ -93,10 +93,4 @@ const increment = () => {
     qty.value++;
   }
 }
-
-watchEffect(async () => {
-  if (stage.value < 3) {
-    router.push({ name: 'home' })
-  }
-})
 </script>

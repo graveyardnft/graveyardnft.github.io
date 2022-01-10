@@ -9,6 +9,7 @@ import Homepage from './components/Homepage.vue'
 import LastRites from './components/LastRites.vue'
 import Whitelist from './components/Whitelist.vue'
 import Mint from './components/Mint.vue'
+import CommitPage from './components/CommitPage.vue'
 import NotFound from './components/NotFound.vue'
 
 const routes = [
@@ -16,6 +17,7 @@ const routes = [
     { path: '/last-rites', name: 'last-rites', component: LastRites },
     { path: '/whitelist', name: 'whitelist', component: Whitelist, meta: { web3: true } },
     { path: '/mint', name: 'mint', component: Mint, meta: { web3: true } },
+    { path: '/committal', name: 'commit', component: CommitPage, meta: { web3: true } },
     // { path: '/crypts', name: 'crypts', component: { render: () => h('div', ['crypts']) }, meta: { web3: true } },
     // { path: '/crypts/:tokenId(\\d+)', name: 'crypt', component: { render (): object { return h('div', ['crypt', this.$route.params.tokenId ]) } }, meta: { web3: true } },
     { path: '/:pathMatch(.*)', name: 'not-found', component: NotFound }

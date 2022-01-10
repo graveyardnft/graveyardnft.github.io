@@ -5,7 +5,10 @@
     <h3 v-else-if="whitelisted.length >= 2000" class="text-xl">
       Whitelist full, join us on discord for announcements on the public sale.
     </h3>
-    <Commit v-else :account="account" :graveyardAddress="contract.address" />
+    <template v-else>
+      <p class="text-lg mb-8">Committing NFTs to the Graveyard is your last action as the token holder.<br/>Committal transfers ownership to the contract, and they are no longer in your control.<br/>This is not staking, you no longer own the token.</p>
+      <Commit :account="account" :graveyardAddress="contract.address" />
+    </template>
   </div>
   <div v-else-if="stage === 2" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <div class="text-3xl md:text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
@@ -15,18 +18,18 @@
     </template>
     <h2 v-else class="text-xl">{{ ensName || shortAccount }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
   </div>
+  <div v-else class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
+    <h2 class="text-5xl">Whitelisting inactive.</h2>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, inject, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import Modal from './Modal.vue'
 import Commit from './Commit.vue'
 import WhitelistMint from './WhitelistMint.vue'
 import wl from '../whitelist.json'
-
-const router = useRouter()
 
 const account = inject<string|null>('account', null)
 const shortAccount = inject<string|null>('shortAccount', null)
@@ -60,9 +63,7 @@ const loadWhitelist = async (contract: ethers.Contract) => {
 }
 
 watchEffect(async () => {
-  if (![1,2].includes(stage.value)) {
-    router.push({ name: 'home' })
-  } else {
+  if ([1,2].includes(stage.value)) {
     loadWhitelist(contract.value)
   }
 })

@@ -2,10 +2,11 @@
   <div class="container mx-auto flex-col pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <h1 class="text-3xl md:text-5xl leading-snug mb-4">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</h1>
     <h2 class="text-md">Join our discord to stay up to date on news and announcements.</h2>
-    <div class="flex items-center justify-center my-6">
+    <div class="flex flex-wrap items-center justify-center my-6">
       <Button v-if="stage === 1" class="m-2" @click="router.push({ name: 'whitelist' })">Whitelist</Button>
       <Button class="m-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
       <Button v-if="stage >= 2" class="m-2" @click="addUrn">Add URN Token</Button>
+      <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'commit' })">Committal</Button>
     </div>
     <div v-if="stage >= 2 && minted <= maxSupply">
       <div class="text-3xl md:text-5xl leading-snug my-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
