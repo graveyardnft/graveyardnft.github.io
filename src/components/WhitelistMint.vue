@@ -1,7 +1,22 @@
 <template>
-  Max 3 per wallet
-  <input v-model="qty" type="number" min="1" max="3" placeholder="Number of CRYPTs" />
-  <button type="button" @click="mint(qty, proofs)">Mint</button>
+  <div class="flex flex-col w-96 max-w-full mx-auto p-8 bg-gray-600/90 rounded border-4 border-gray-700">
+    <h3 class="mb-2 text-2xl text-center text-slate-800">Max 3 per wallet</h3>
+    <h4 class="mb-2 text-xl text-center text-slate-800">0.0{{ qty * 25 }} ETH</h4>
+    <div class="mb-2 flex items-center justify-center text-slate-800">
+      <a class="hover:text-slate-700" @click.stop="decrement">
+        <svg viewBox="0 0 24 24" class="fill-current h-6 w-6">
+          <path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+        </svg>
+      </a>
+      <input v-model="qty" type="number" disabled min="1" max="3" class="p-2 rounded text-2xl bg-transparent text-center text-slate-800 placeholder:text-slate-800 outline-none focus:ring ring-slate-800/25" placeholder="Number of CRYPTs" />
+      <a class="hover:text-slate-700" @click.stop="increment">
+        <svg viewBox="0 0 24 24" class="fill-current h-6 w-6">
+          <path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+        </svg>
+      </a>
+    </div>
+    <Button @click="mint(qty, proofs)">Mint</Button>
+  </div>
   <Modal v-if="minting" @close="reset">
     <template #header>
       Minting CRYPTs
@@ -17,6 +32,7 @@ import { inject, ref } from 'vue'
 import { ethers } from 'ethers'
 import Modal from './Modal.vue'
 import Transaction from './Transaction.vue'
+import Button from './Button.vue'
 
 const props = defineProps({
   account: {
@@ -64,5 +80,16 @@ const reset = () => {
   minting.value = false
   transaction.value = null
   receipt.value = null;
+}
+
+const decrement = () => {
+  if (qty.value > 1) {
+    qty.value--;
+  }
+}
+const increment = () => {
+  if (qty.value < 3) {
+    qty.value++;
+  }
 }
 </script>

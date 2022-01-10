@@ -1,19 +1,19 @@
 <template>
-  <div v-if="stage === 1" class="container mx-auto py-32 text-center">
-    <h1 class="text-5xl leading-snug mb-4">Whitelisted {{ whitelisted.length }}/2000</h1>
-    <h2 v-if="isWhitelisted" class="text-xl">Congratulations! {{ ensName || account }} Is whitelisted!</h2>
+  <div v-if="stage === 1" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
+    <h1 class="text-3xl md:text-5xl leading-snug mb-8">Whitelisted {{ whitelisted.length }}/2000</h1>
+    <h2 v-if="isWhitelisted" class="text-xl">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
     <h3 v-else-if="whitelisted.length >= 2000" class="text-xl">
       Whitelist full, join us on discord for announcements on the public sale.
     </h3>
     <Commit v-else :account="account" :graveyardAddress="contract.address" />
   </div>
-  <div v-else-if="stage === 2" class="container mx-auto py-32 text-center">
-    <div class="text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
+  <div v-else-if="stage === 2" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
+    <div class="text-3xl md:text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
     <template v-if="isWhitelisted">
-      <h2 class="text-xl">Congratulations! {{ ensName || account }} Is whitelisted!</h2>
+      <h2 class="text-xl mb-8">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
       <WhitelistMint :account="account" :proofs="proofs" />
     </template>
-    <h2 v-else class="text-xl">{{ ensName || account }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
+    <h2 v-else class="text-xl">{{ ensName || shortAccount }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
   </div>
 </template>
 
@@ -29,6 +29,7 @@ import wl from '../whitelist.json'
 const router = useRouter()
 
 const account = inject<string|null>('account', null)
+const shortAccount = inject<string|null>('shortAccount', null)
 const ensName = inject<string|null>('ensName', null)
 const contract = inject<ethers.Contract>('contract')
 const stage = inject<number>('stage')

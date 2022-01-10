@@ -181,7 +181,7 @@ export default defineComponent({
 
     const handler = (err: Error) => {
       console.error(err)
-      error.value = err.message
+      error.value = err?.error ? err.error.message.replace('execution reverted: ', '') : err.message
       setTimeout(() => (error.value = null), 5000)
       return false
     }
