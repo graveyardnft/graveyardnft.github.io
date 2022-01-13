@@ -3,10 +3,11 @@
 @tailwind utilities;
 
 body {
-    /*background: url('./bg.jpg');*/
-    /*background-repeat: no-repeat;*/
-    /*background-attachment: fixed;*/
-    /*background-position: center;*/
+    background: url('./bg.svg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
     font-family: 'MedievalSharp', serif;
 }
 input::-webkit-outer-spin-button,

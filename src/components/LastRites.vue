@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 md:px-0">
-    <div class="my-8 p-8 bg-gray-600/90 rounded border-4 border-gray-700 text-slate-900">
+    <div class="my-8 p-8 bg-slate-900/75 rounded border-4 border-slate-900 text-grey-100">
       <p class="mb-2">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</p>
       <p class="mb-2">They could be unsuccessful for any number of reasons: lack of community, lack of delivery, roadmap lost its way, or just plain old dev rugs. The graveyard is open to all ERC721 tokens.</p>
       <p class="mb-6">No longer shall your marketplace’s hidden token tab be cluttered with tokens you wish weren’t in your wallet.</p>
@@ -12,8 +12,7 @@
       <p class="mb-2">The Graveyard has a limited number of CRYPTs (6969). Owners of CRYPTs receive the ability to display all tokens sent to the Graveyard from the address that also owns the CRYPT, and own the rights to the generated artwork for their CRYPT token.</p>
       <p class="mb-2">The Graveyard dApp displays the Committed tokens housed in each CRYPT (all tokens sent to the Graveyard by the CRYPT owner).</p>
       <p class="mb-2">A transfer in ownership of the CRYPT changes what is displayed in the CRYPT to the tokens committed by the new owner.</p>
-      <p class="mb-6">Each token committed to the Graveyard returns URN to the sender of tokens for Committal.</p>
-      <p class="mb-2">URN is returned to the sender at a rate of 100 URN per token committed for none CRYPT owners.</p>
+      <p class="mb-6">Each token committed to the Graveyard returns URN to the sender if they hold a CRYPT.</p>
       <p class="mb-6">CRYPT owners receive 1000 URN per token * the number of CRYPTs owned.</p>
       <p class="mb-2">URN is a token that follows the ERC20 token standard and has no fixed supply.</p>
       <p class="mb-2">URN is a token enshrined in the Ethereum ledger.</p>

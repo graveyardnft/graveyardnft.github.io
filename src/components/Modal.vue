@@ -1,7 +1,7 @@
 <template>
-  <div class="fixed top-0 left-0 w-full h-full bg-black/25 flex items-center justify-center">
-    <div class="w-2/3 lg:w-1/3 bg-gray-900 rounded-lg border border-gray-800 shadow">
-      <header class="flex items-center p-4 border-b border-gray-800">
+  <div class="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center">
+    <div class="w-2/3 lg:w-1/3 bg-slate-800 rounded border border-slate-900 shadow">
+      <header class="flex items-center p-4 border-b border-slate-900">
         <div>
           <slot name="header" />
         </div>

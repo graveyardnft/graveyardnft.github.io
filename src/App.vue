@@ -152,7 +152,7 @@ export default defineComponent({
     }
 
     const updateStage = async () => {
-      stage.value = 4//(await contract.value._releaseStage()).toNumber()
+      stage.value = (await contract.value._releaseStage()).toNumber()
       console.debug('stage', stage.value)
     }
 
