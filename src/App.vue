@@ -229,3 +229,13 @@ export default defineComponent({
   }
 })
 </script>
+
+<style>
+body {
+  background: url('./assets/bg.svg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+}
+</style>
