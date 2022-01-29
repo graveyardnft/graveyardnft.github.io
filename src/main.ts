@@ -33,7 +33,8 @@ createApp(App, {
     provider: (window as any)?.ethereum ? new ethers.providers.Web3Provider((window as any).ethereum) : null,
     ensDomain: 'test.graveyardnft.eth',
     openSea: 'https://opensea.io/collection/GraveyardNFT',
-    contractAddresses: { 1: null, 4: '0xEd8a67404aD5665E32537Dd7356826109D6df5c2' }
+    graveyardAddresses: { 1: null, 4: '0x86D1239bfd0Df429Ed6d99Ce3E998E34827F7622' },
+    cryptAddresses: { 1: null, 4: null }
 })
 .use(router)
 .mount('#app')

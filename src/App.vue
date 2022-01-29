@@ -61,7 +61,8 @@ import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { CID } from 'multiformats/cid'
 import { getContract } from './utils'
-import abi from './abi.json'
+import graveyardAbi from './graveyardAbi.json'
+import cryptAbi from './cryptAbi.json'
 import Menu from './components/Menu.vue'
 import Button from './components/Button.vue'
 
@@ -71,7 +72,11 @@ export default defineComponent({
     provider: {
       type: ethers.providers.Web3Provider
     },
-    contractAddresses: {
+    graveyardAddresses: {
+      type: Object,
+      required: true
+    },
+    cryptAddresses: {
       type: Object,
       required: true
     },
@@ -103,8 +108,10 @@ export default defineComponent({
     const isRinkeby = computed<boolean>(() => network.value?.chainId === 4)
     const isConnected = computed<boolean>(() => !!account.value && (isMainNet.value || isRinkeby.value))
     const etherscanUrl = computed(() => `https://${isRinkeby.value ? 'rinkeby.' : ''}etherscan.io`)
-    const contractAddress = computed<string>(() => props.contractAddresses[isConnected.value ? network.value.chainId : 1])
-    const contract = computed<ethers.Contract|null>(() => isConnected.value && props.contractAddresses[network.value.chainId] ? getContract(props.contractAddresses[network.value.chainId], abi) : null)
+    const graveyardAddress = computed<string>(() => props.graveyardAddresses[isConnected.value ? network.value.chainId : 1])
+    const graveyard = computed<ethers.Contract|null>(() => isConnected.value && props.graveyardAddresses[network.value.chainId] ? getContract(props.graveyardAddresses[network.value.chainId], graveyardAbi) : null)
+    const cryptAddress = computed<string>(() => props.cryptAddresses[isConnected.value ? network.value.chainId : 1])
+    const crypt = computed<ethers.Contract|null>(() => isConnected.value && props.cryptAddresses[network.value.chainId] ? getContract(props.cryptAddresses[network.value.chainId], cryptAbi) : null)
     const maxSupply = ref(0)
     const stage = ref(0)
     const minted = ref(0)
@@ -128,8 +135,10 @@ export default defineComponent({
     provide('isMainNet', isMainNet)
     provide('isRinkeby', isRinkeby)
     provide('etherscanUrl', etherscanUrl)
-    provide('contract', contract)
-    provide('contractAddress', contractAddress)
+    provide('contract', graveyard)
+    provide('contractAddress', graveyardAddress)
+    provide('crypt', crypt)
+    provide('cryptAddress', cryptAddress)
     provide('maxSupply', maxSupply)
     provide('stage', stage)
     provide('minted', minted)
@@ -147,12 +156,14 @@ export default defineComponent({
     }
 
     const updateMinted = async () => {
-      minted.value = (await contract.value.totalSupply()).toNumber()
+      if (!crypt.value) return;
+      minted.value = (await crypt.value.totalSupply()).toNumber()
+      minted.value = 0;
       console.debug('minted', minted.value)
     }
 
     const updateStage = async () => {
-      stage.value = (await contract.value._releaseStage()).toNumber()
+      stage.value = (await graveyard.value.releaseStage()).toNumber()
       console.debug('stage', stage.value)
     }
 
@@ -194,14 +205,15 @@ export default defineComponent({
 
     // Reactive stage, and minted total for use in components
     watchEffect(async () => {
-      if (isConnected.value && contract.value) {
+      if (isConnected.value && graveyard.value) {
         updateIpfs()
-        maxSupply.value = (await contract.value.MAX_SUPPLY()).toNumber()
+        // maxSupply.value = (await graveyard.value.MAX_SUPPLY()).toNumber()
+        maxSupply.value = 6969;
         console.debug('maxSupply', maxSupply.value)
         updateStage()
         updateMinted()
-        contract.value.on(contract.value.filters.ReleaseStage(), updateStage)
-        contract.value.on(contract.value.filters.Transfer(ethers.constants.AddressZero), updateMinted)
+        graveyard.value.on(graveyard.value.filters.ReleaseStage(), updateStage)
+        if (crypt.value) crypt.value.on(crypt.value.filters.Transfer(ethers.constants.AddressZero), updateMinted)
       }
     })
 
@@ -213,7 +225,7 @@ export default defineComponent({
       ipfs,
       isConnected,
       connect,
-      contract,
+      graveyard,
       ensName,
       shortAccount,
       account,
