@@ -156,7 +156,6 @@ export default defineComponent({
     }
 
     const updateMinted = async () => {
-      if (!crypt.value) return;
       minted.value = (await crypt.value.totalSupply()).toNumber()
       minted.value = 0;
       console.debug('minted', minted.value)
@@ -207,13 +206,14 @@ export default defineComponent({
     watchEffect(async () => {
       if (isConnected.value && graveyard.value) {
         updateIpfs()
-        // maxSupply.value = (await graveyard.value.MAX_SUPPLY()).toNumber()
-        maxSupply.value = 6969;
-        console.debug('maxSupply', maxSupply.value)
         updateStage()
-        updateMinted()
         graveyard.value.on(graveyard.value.filters.ReleaseStage(), updateStage)
-        if (crypt.value) crypt.value.on(crypt.value.filters.Transfer(ethers.constants.AddressZero), updateMinted)
+        if (crypt.value) {
+          maxSupply.value = (await crypt.value._maxSupply()).toNumber();
+          console.debug('maxSupply', maxSupply.value)
+          updateMinted()
+          crypt.value.on(crypt.value.filters.Transfer(ethers.constants.AddressZero), updateMinted)
+        }
       }
     })
 

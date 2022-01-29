@@ -2,9 +2,6 @@
   <div v-if="stage === 1" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <h1 class="text-3xl md:text-5xl leading-snug mb-8">Whitelisting</h1>
     <h2 v-if="whitelisted" class="text-xl">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
-<!--    <h3 v-else-if="whitelisted.length >= 2000" class="text-xl">-->
-<!--      Whitelist full, join us on discord for announcements on the public sale.-->
-<!--    </h3>-->
     <template v-else>
       <p class="text-lg mb-8">Committing NFTs to the Graveyard is your last action as the token holder.<br/>Committal transfers ownership to the contract, and they are no longer in your control.<br/>This is not staking, you no longer own the token.</p>
       <Commit :account="account" :graveyardAddress="contract.address" />
@@ -19,7 +16,9 @@
     <h2 v-else class="text-xl">{{ ensName || shortAccount }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
   </div>
   <div v-else class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
-    <h2 class="text-5xl">Whitelisting inactive.</h2>
+    <h1 class="text-3xl md:text-5xl leading-snug mb-8">Whitelisting</h1>
+    <h2 v-if="whitelisted" class="text-xl mb-2">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
+    <h2 v-else class="text-xl">Whitelisting inactive, join us on discord for further announcements.</h2>
   </div>
 </template>
 
@@ -39,14 +38,12 @@ const maxSupply = inject<number>('maxSupply')
 
 const whitelisted = ref<boolean>(false)
 
-const checkWhitelist = async (contract: ethers.Contract) => {
-  whitelisted.value = await contract.isWhitelisted(account.value, 1);
+const checkWhitelist = async (contract: ethers.Contract, account: string) => {
+  whitelisted.value = await contract.isWhitelisted(account, 1);
 }
 
 watchEffect(async () => {
-  if ([1,2].includes(stage.value)) {
-    checkWhitelist(contract.value);
-    contract.value.on(contract.value.filters.Committed(), () => checkWhitelist(contract.value));
-  }
+  checkWhitelist(contract.value, account.value);
+  contract.value.on(contract.value.filters.Committed(), () => checkWhitelist(contract.value, account.value));
 })
 </script>
