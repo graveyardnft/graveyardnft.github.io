@@ -15,7 +15,7 @@
         </svg>
       </a>
     </div>
-    <Button @click="mint(qty, proofs)">Mint</Button>
+    <Button @click="mint(qty)">Mint</Button>
   </div>
   <Modal v-if="minting" @close="reset">
     <template #header>
@@ -38,30 +38,29 @@ const props = defineProps({
   account: {
     type: String,
     required: true
-  },
-  proofs: {
-    type: Array,
-    required: true
   }
 })
 
-const contract = inject<ethers.Contract>('contract')
+const graveyard = inject<ethers.Contract>('contract')
+const crypt = inject<ethers.Contract>('crypt')
+const account = inject('account')
 const success = inject<(msg: string) => {}>('success')
 const qty = ref(1)
 const transaction = ref(null)
 const receipt = ref(null)
 const minting = ref(false)
 
-const mint = async (qty: number, proofs: string[]) => {
+const mint = async (qty: number) => {
   if (qty < 1) throw new Error('Minimum 1 per transaction')
   if (qty > 3) throw new Error('Maximum 3 per wallet')
-  if (proofs.length < 1) throw new Error('Wallet not on the whitelist')
+
+  if (!await graveyard.value.isWhitelisted(account.value, qty)) throw new Error('Maximum 3 per wallet')
 
   minting.value = true
   transaction.value = null
   receipt.value = null
   try {
-    transaction.value = await contract.value.whitelistMint(qty, proofs, { value: ethers.utils.parseEther('0.025').mul(qty) })
+    transaction.value = await crypt.value.whitelistMint(qty, { value: ethers.utils.parseEther('0.025').mul(qty) })
   } catch (e) {
     reset()
     throw e

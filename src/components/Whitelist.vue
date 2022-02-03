@@ -11,7 +11,7 @@
     <div class="text-3xl md:text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
     <template v-if="whitelisted">
       <h2 class="text-xl mb-8">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
-      <WhitelistMint :account="account" :proofs="[]" />
+      <WhitelistMint :account="account" />
     </template>
     <h2 v-else class="text-xl">{{ ensName || shortAccount }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
   </div>

@@ -44,7 +44,7 @@ import Transaction from './Transaction.vue'
 import Button from './Button.vue'
 
 const stage = inject<number>('stage')
-const contract = inject<ethers.Contract>('contract')
+const crypt = inject<ethers.Contract>('crypt')
 const success = inject<(msg: string) => {}>('success')
 const minted = inject<number>('minted')
 const maxSupply = inject<number>('maxSupply')
@@ -62,7 +62,7 @@ const mint = async (qty: number) => {
   transaction.value = null
   receipt.value = null
   try {
-    transaction.value = await contract.value.mint(qty, { value: ethers.utils.parseEther('0.025').mul(qty) })
+    transaction.value = await crypt.value.mint(qty, { value: ethers.utils.parseEther('0.025').mul(qty) })
   } catch (e) {
     reset()
     throw e

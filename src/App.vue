@@ -63,6 +63,7 @@ import { CID } from 'multiformats/cid'
 import { getContract } from './utils'
 import graveyardAbi from './graveyardAbi.json'
 import cryptAbi from './cryptAbi.json'
+import urnAbi from './urnAbi.json'
 import Menu from './components/Menu.vue'
 import Button from './components/Button.vue'
 
@@ -77,6 +78,10 @@ export default defineComponent({
       required: true
     },
     cryptAddresses: {
+      type: Object,
+      required: true
+    },
+    urnAddresses: {
       type: Object,
       required: true
     },
@@ -112,7 +117,9 @@ export default defineComponent({
     const graveyard = computed<ethers.Contract|null>(() => isConnected.value && props.graveyardAddresses[network.value.chainId] ? getContract(props.graveyardAddresses[network.value.chainId], graveyardAbi) : null)
     const cryptAddress = computed<string>(() => props.cryptAddresses[isConnected.value ? network.value.chainId : 1])
     const crypt = computed<ethers.Contract|null>(() => isConnected.value && props.cryptAddresses[network.value.chainId] ? getContract(props.cryptAddresses[network.value.chainId], cryptAbi) : null)
-    const maxSupply = ref(0)
+    const urnAddress = computed<string>(() => props.urnAddresses[isConnected.value ? network.value.chainId : 1])
+    const urn = computed<ethers.Contract|null>(() => isConnected.value && props.urnAddresses[network.value.chainId] ? getContract(props.urnAddresses[network.value.chainId], urnAbi) : null)
+    const maxSupply = ref(6969)
     const stage = ref(0)
     const minted = ref(0)
 
@@ -139,6 +146,8 @@ export default defineComponent({
     provide('contractAddress', graveyardAddress)
     provide('crypt', crypt)
     provide('cryptAddress', cryptAddress)
+    provide('urn', urn)
+    provide('urnAddress', urnAddress)
     provide('maxSupply', maxSupply)
     provide('stage', stage)
     provide('minted', minted)
@@ -157,7 +166,6 @@ export default defineComponent({
 
     const updateMinted = async () => {
       minted.value = (await crypt.value.totalSupply()).toNumber()
-      minted.value = 0;
       console.debug('minted', minted.value)
     }
 
@@ -170,10 +178,12 @@ export default defineComponent({
       if (network.value?.chainId === 1) {
         const resolver = await provider.getResolver(ipfs.value.domain)
         const hash = await resolver.getContentHash()
-        ipfs.value.hash = hash
-        const cid = CID.parse(hash.replace(/ip[fn]s:\/\//, ''))
-        ipfs.value.cid = cid.toV0().toString()
-        ipfs.value.base32 = cid.toV1().toString()
+        if (hash) {
+          ipfs.value.hash = hash
+          const cid = CID.parse(hash.replace(/ip[fn]s:\/\//, ''))
+          ipfs.value.cid = cid.toV0().toString()
+          ipfs.value.base32 = cid.toV1().toString()
+        }
       }
       console.debug('ipfs', ipfs.value)
     }
@@ -209,8 +219,6 @@ export default defineComponent({
         updateStage()
         graveyard.value.on(graveyard.value.filters.ReleaseStage(), updateStage)
         if (crypt.value) {
-          maxSupply.value = (await crypt.value._maxSupply()).toNumber();
-          console.debug('maxSupply', maxSupply.value)
           updateMinted()
           crypt.value.on(crypt.value.filters.Transfer(ethers.constants.AddressZero), updateMinted)
         }
