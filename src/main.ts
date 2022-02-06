@@ -13,6 +13,8 @@ import CommitPage from './components/CommitPage.vue'
 // import Crypts from './components/Crypts.vue'
 import NotFound from './components/NotFound.vue'
 
+if (typeof window !== 'undefined') window.global = window;
+
 const routes = [
     { path: '/', name: 'home', component: Homepage, meta: { web3: true } },
     { path: '/last-rites', name: 'last-rites', component: LastRites },

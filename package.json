@@ -26,6 +26,7 @@
     "cid": "node cid"
   },
   "dependencies": {
+    "snap-fade-away": "^1.0.1",
     "vue": "^3.2.25"
   },
   "devDependencies": {
