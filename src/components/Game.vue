@@ -14,7 +14,7 @@
           class="absolute cursor-pointer"
           @click.prevent="updateScore(index)"
       >
-        <img src="logo.svg" :class="{'grayscale-[75%]': !valid, rotate: clicked, 'hover:scale-110': true }" />
+        <img src="/logo.svg" :class="{'grayscale-[75%]': !valid, rotate: clicked, 'hover:scale-110': true }" />
       </div>
     </TransitionGroup>
     <h2 class="text-5xl text-center mb-6">{{ text }}</h2>
