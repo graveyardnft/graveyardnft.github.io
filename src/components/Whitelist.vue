@@ -17,8 +17,10 @@
   </div>
   <div v-else class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <h1 class="text-3xl md:text-5xl leading-snug mb-8">Whitelisting</h1>
-    <h2 v-if="whitelisted" class="text-xl mb-2">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
-    <h2 v-else class="text-xl">Whitelisting inactive, join us on discord for further announcements.</h2>
+    <h2 class="text-xl mb-2">Whitelisting inactive, join us on discord for further announcements.</h2>
+    <h2 v-if="whitelisted === null" class="text-xl mb-2">Checking whitelist status...</h2>
+    <h2 v-else-if="whitelisted" class="text-xl mb-2">Congratulations! {{ ensName || shortAccount }} is whitelisted!</h2>
+    <h2 v-else class="text-xl mb-2">Oh snap! {{ ensName || shortAccount }} is NOT whitelisted!</h2>
   </div>
 </template>
 
@@ -36,7 +38,7 @@ const stage = inject<number>('stage')
 const minted = inject<number>('minted')
 const maxSupply = inject<number>('maxSupply')
 
-const whitelisted = ref<boolean>(false)
+const whitelisted = ref<boolean|null>(null)
 
 const checkWhitelist = async (contract: ethers.Contract, account: string) => {
   whitelisted.value = await contract.isWhitelisted(account, 1);
