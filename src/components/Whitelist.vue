@@ -9,10 +9,10 @@
   </div>
   <div v-else-if="stage === 2" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <div class="text-3xl md:text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
-    <template v-if="whitelisted">
+    <Game v-if="whitelisted">
       <h2 class="text-xl mb-8">Congratulations! {{ ensName || shortAccount }} Is whitelisted!</h2>
       <WhitelistMint :account="account" />
-    </template>
+    </Game>
     <h2 v-else class="text-xl">{{ ensName || shortAccount }} is not whitelisted, join us on discord for announcements on the public sale.</h2>
   </div>
   <div v-else class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
@@ -29,6 +29,7 @@ import { ref, inject, watchEffect } from 'vue'
 import { ethers } from 'ethers'
 import Commit from './Commit.vue'
 import WhitelistMint from './WhitelistMint.vue'
+import Game from './Game.vue'
 
 const account = inject<string|null>('account', null)
 const shortAccount = inject<string|null>('shortAccount', null)
