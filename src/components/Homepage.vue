@@ -4,7 +4,6 @@
     <h2 class="text-xl mb-3">Tokens committed to the graveyard: {{ committed }}</h2>
     <div class="flex flex-wrap items-center justify-center my-6">
       <Button v-if="stage === 1" class="m-2" @click="router.push({ name: 'whitelist' })">Whitelist</Button>
-      <Button class="m-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
       <Button v-if="urnAddress" class="m-2" @click="addUrn">Add URN Token</Button>
       <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'commit' })">Committal</Button>
 <!--      <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'crypts' })">View CRYPT's</Button>-->
@@ -39,16 +38,7 @@ const web3 = inject('web3')
 const contract = inject<ethers.Contract>('contract')
 const urn = inject<ethers.Contract>('urn')
 const urnAddress = inject<string>('urnAddress')
-
-const committed = ref(0)
-
-contract.value.queryFilter(contract.value.filters.Committed())
-  .then((events: object[]) => {
-    committed.value = events.length;
-    contract.value.on(contract.value.filters.Committed(), () => {
-      committed.value++;
-    })
-  })
+const committed = inject<number>('committed')
 
 const addUrn = async () => {
   const symbol = await urn.value.symbol()

@@ -9,11 +9,9 @@
     <input v-model="contractAddress" @blur="loadToken" type="text" class="mb-2 p-2 rounded text-2xl bg-transparent text-center placeholder:text-grey-100  outline-none focus:ring ring-slate-600/25" placeholder="Enter contract address" />
     <input v-model="tokenId" @blur="loadToken" type="number" class="mb-2 p-2 rounded text-2xl bg-transparent text-center placeholder:text-grey-100  outline-none focus:ring ring-slate-600/25" placeholder="Enter tokenId" />
     <input v-model="data" type="text" class="mb-6 p-2 rounded text-2xl bg-transparent text-center placeholder:text-grey-100  outline-none focus:ring ring-slate-600/25" placeholder="Last rites" />
-    <template v-if="meta && !loadingMeta">
-      <img :src="meta.image" class="mb-2"/>
-      <span class="mb-2">{{ meta.tokenName }} ({{ meta.tokenSymbol }})</span>
-      <span class="mb-6">{{ meta.name }}</span>
-    </template>
+    <img v-if="!loadingMeta && meta && meta.image" :src="meta.image" class="mb-2"/>
+    <span v-if="!loadingMeta && meta && meta.tokenName && meta.tokenSymbol" class="mb-2">{{ meta.tokenName }} ({{ meta.tokenSymbol }})</span>
+    <span v-if="!loadingMeta && meta && meta.name" class="mb-6">{{ meta.name }}</span>
     <Button @click="commit(contractAddress, tokenId, data)">Commit To The Graveyard</Button>
   </div>
   <Modal v-if="helpOpen" @close="toggleHelp">
@@ -21,6 +19,7 @@
       Transferring Token To The Graveyard
     </template>
     <div class="text-left">
+      <p class="mb-2">Tokens MUST be ERC721 on the Ethereum Network.</p>
       <p class="mb-2 text-xl">Contract Address & tokenId</p>
       <p class="mb-2">Enter the contract address of the token you wish to transfer to the graveyard, and the tokenId.</p>
       <p class="mb-2">These can be found on OpenSea in the url when you view the item.</p>
@@ -133,24 +132,29 @@ const reset = () => {
 
 const loadToken = async () => {
   try {
-    if (loadingMeta.value !== true && contractAddress.value !== '' && tokenId.value !== null) {
+    if (loadingMeta.value !== true && contractAddress.value !== '') {
       loadingMeta.value = true;
       const contract = getContract(contractAddress.value, [
         'function symbol() view returns (string)',
         'function name() view returns (string)',
         'function tokenURI(uint256 tokenId) view returns (string)'
       ])
-      let uri = await contract.tokenURI(tokenId.value);
-      uri = uri.replace('ipfs://', 'https://dweb.link/ipfs/')
-      const res = await fetch(uri)
-      const json = await res.json()
       meta.value = {
         contractAddress: contractAddress.value,
-        tokenId: tokenId.value,
         tokenName: await contract.name(),
-        tokenSymbol: await contract.symbol(),
-        ...json,
-        image: json.image.replace('ipfs://', 'https://dweb.link/ipfs/')
+        tokenSymbol: await contract.symbol()
+      }
+      if (tokenId.value !== null) {
+        let uri = await contract.tokenURI(tokenId.value);
+        uri = uri.replace('ipfs://', 'https://dweb.link/ipfs/')
+        const res = await fetch(uri)
+        const json = await res.json()
+        meta.value = {
+          ...meta.value,
+          tokenId: tokenId.value,
+          ...json,
+          image: json.image.replace('ipfs://', 'https://dweb.link/ipfs/')
+        }
       }
       loadingMeta.value = false;
     }

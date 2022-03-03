@@ -8,7 +8,7 @@
             <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
           </svg>
         </a>
-        <span aria-current="page" class="inline-flex items-center px-4 py-2 border-l border-slate-900 text-sm">{{ page }} of {{ maxPage }}</span>
+        <span aria-current="page" class="inline-flex items-center px-4 py-2 border-l border-slate-900 text-sm">Page {{ page }} of {{ maxPage }} ({{ committed }})</span>
         <a href="#" @click.prevent="nextPage" class="inline-flex items-center px-2 py-2 border-l border-slate-900 rounded-r-md text-sm hover:bg-slate-700">
           <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -41,9 +41,17 @@ import { useRoute, useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { debounce } from 'debounce'
 
+const props = defineProps({
+  from: {
+    type: String,
+    default: null
+  }
+})
+
 const route = useRoute()
 const router = useRouter()
 const contract = inject<ethers.Contract>('contract')
+const committed = inject<number>('committed')
 
 const tokens = ref<object[]>([])
 const tokenContracts = ref<Record<string, object>>({})
@@ -150,10 +158,11 @@ const loadToken = async (event: object) => {
   event.loaded = true
 }
 
-contract.value.queryFilter(contract.value.filters.Committed())
+const filter = contract.value.filters.Committed(props.from)
+contract.value.queryFilter(filter)
     .then((events: object[]) => {
       tokens.value = events.map(e => loadContract(parseEvent(e)))
-      contract.value.on(contract.value.filters.Committed(), (event: object) => {
+      contract.value.on(filter, (event: object) => {
         tokens.value.push(loadContract(parseEvent(event)))
       })
     })

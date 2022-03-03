@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-4 md:px-0">
-    <div class="my-8 p-8 bg-slate-900/75 rounded border-4 border-slate-900 text-grey-100">
+    <div class="my-8 p-8 bg-slate-900/75 rounded border-4 border-slate-900 text-grey-100 font-sans">
       <p class="mb-4">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</p>
       <p class="mb-4">They could be unsuccessful for any number of reasons: lack of community, lack of delivery, roadmap lost its way, or just plain old dev rugs.</p>
       <p class="mb-4">The graveyard is open to all ERC721 tokens. No longer shall your marketplace’s hidden token tab be cluttered with tokens you wish weren’t in your wallet.</p>

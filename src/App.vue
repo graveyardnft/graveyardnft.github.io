@@ -122,6 +122,7 @@ export default defineComponent({
     const maxSupply = ref(6969)
     const stage = ref(0)
     const minted = ref(0)
+    const committed = ref(0)
 
     let timeout: number
     provide('success', (msg: string) => {
@@ -151,6 +152,7 @@ export default defineComponent({
     provide('maxSupply', maxSupply)
     provide('stage', stage)
     provide('minted', minted)
+    provide('committed', committed)
 
     const connect = () => provider?.provider?.request({ method: 'eth_requestAccounts' }).then(updateAccounts)
 
@@ -188,6 +190,15 @@ export default defineComponent({
       console.debug('ipfs', ipfs.value)
     }
 
+    const updateCommitted = async () => {
+      const filter = graveyard.value.filters.Committed()
+      const events = await graveyard.value.queryFilter(filter)
+      committed.value = events.length;
+      graveyard.value.on(filter, () => {
+        committed.value++;
+      })
+    }
+
     if (provider) {
       provider.getNetwork().then(net => {
         network.value = net
@@ -217,6 +228,7 @@ export default defineComponent({
       if (isConnected.value && graveyard.value) {
         updateIpfs()
         updateStage()
+        updateCommitted()
         graveyard.value.on(graveyard.value.filters.ReleaseStage(), updateStage)
         if (crypt.value) {
           updateMinted()
