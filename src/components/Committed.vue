@@ -25,8 +25,33 @@
           :tokenId="token.tokenId"
           :metaData="token.tokenMetadata"
           :loading="token.loading"
+          @click="selectedToken = token"
       />
     </div>
+    <Modal v-if="selectedToken" full @close="selectedToken = null">
+      <template #header>#{{ selectedToken.tokenId }} {{ tokenContracts[selectedToken.contract]?.name }}<template v-if="tokenContracts[selectedToken.contract]?.symbol"> ({{ tokenContracts[selectedToken.contract]?.symbol }})</template></template>
+      <div class="flex flex-col md:flex-row">
+        <div class="w-full lg:w-1/2 md:pr-2">
+          <TokenImage :src="selectedToken.tokenMetadata.image || 'logo.svg'" :grayscale="false" />
+          <span>{{ selectedToken.message }}</span>
+        </div>
+        <div class="w-full lg:w-1/2 md:pl-2">
+          <div class="grid grid-cols-3 gap-4">
+            <span class="col-span-3 md:col-span-1 font-bold">TokenId:</span>
+            <span class="col-span-3 md:col-span-2">{{ selectedToken.tokenId }}</span>
+            <span class="col-span-3 md:col-span-1 font-bold">Name:</span>
+            <span class="col-span-3 md:col-span-2">{{ selectedToken.tokenMetadata?.name || 'FULL RUG!' }}</span>
+            <span class="col-span-3 md:col-span-1 font-bold">Description:</span>
+            <span class="col-span-3 md:col-span-2">{{ selectedToken.tokenMetadata?.description || 'FULL RUG!' }}</span>
+            <span class="col-span-3 font-bold">Attributes</span>
+            <template v-for="attribute in selectedToken.tokenMetadata?.attributes">
+              <span class="col-span-3 md:col-span-1 font-bold">{{ attribute.trait_type }}:</span>
+              <span class="col-span-3 md:col-span-2">{{ attribute.value }}</span>
+            </template>
+          </div>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -37,6 +62,8 @@ import { ethers } from 'ethers'
 import { debounce } from 'debounce'
 import { loadTokenURI } from '../utils'
 import Token from './Token.vue'
+import Modal from './Modal.vue'
+import TokenImage from './TokenImage.vue'
 
 const props = defineProps({
   from: {
@@ -53,6 +80,8 @@ const committed = inject<object[]>('committed')
 const tokens = ref<object[]>([])
 const tokenContracts = ref<Record<string, object>>({})
 const query = ref<string>('')
+const selectedToken = ref(null)
+
 const page = computed<number>(() => parseInt(route?.query?.page || 1))
 const filtered = computed<object[]>(() => {
   const q = query.value

@@ -1,8 +1,8 @@
 <template>
   <img
       :src="src.replace('ipfs://', 'https://dweb.link/ipfs/')"
-      class="w-full h-auto mb-2 grayscale-[75%] hover:grayscale-0"
-      :class="{ loading: loading }"
+      class="w-full h-auto mb-2"
+      :class="{ loading: loading, 'grayscale-[75%] hover:grayscale-0': grayscale }"
       onerror="this.src='logo.svg';"
   />
 </template>
@@ -14,6 +14,10 @@ defineProps({
   },
   loading: {
     type: Boolean
+  },
+  grayscale: {
+    type: Boolean,
+    default: true
   }
 })
 </script>
