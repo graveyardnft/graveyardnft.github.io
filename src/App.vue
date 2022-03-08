@@ -92,6 +92,10 @@ export default defineComponent({
     openSea: {
       type: String,
       required: true
+    },
+    looksRare: {
+      type: String,
+      required: true
     }
   },
   setup(props) {
@@ -131,6 +135,7 @@ export default defineComponent({
       timeout = window.setTimeout(() => (success.value = null), 5000)
     })
     provide('openSea', props.openSea)
+    provide('looksRare', props.looksRare)
     provide('provider', provider)
     provide('web3', web3)
     provide('network', network)

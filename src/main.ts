@@ -36,9 +36,10 @@ const router = createRouter({
 createApp(App, {
     provider: (window as any)?.ethereum ? new ethers.providers.Web3Provider((window as any).ethereum) : null,
     ensDomain: 'graveyardnft.eth',
-    openSea: '', //'https://opensea.io/collection/GraveyardNFT',
+    openSea: 'https://opensea.io/collection/graveyard-crypts',
+    looksRare: 'https://looksrare.org/collections/0xda5e043e57d54dbEB0e2BB917cCeB629512c969A',
     graveyardAddresses: { 1: '0xB96C44c007B2cf979cC30fD6650bEd39823c8BE5', 4: '0x86D1239bfd0Df429Ed6d99Ce3E998E34827F7622' },
-    cryptAddresses: { 1: null, 4: '0x39f494b21e48a8d6e4648D916038308FA8489C06' },
+    cryptAddresses: { 1: null, '0xda5e043e57d54dbEB0e2BB917cCeB629512c969A': '0x39f494b21e48a8d6e4648D916038308FA8489C06' },
     urnAddresses: { 1: null, 4: '0x2325EA6B9fF882Bb855F92749a8E2B13daE7c409' }
 })
 .use(router)
