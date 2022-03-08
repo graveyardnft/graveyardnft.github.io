@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto flex-col pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <h1 class="text-3xl md:text-5xl leading-snug mb-4">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</h1>
-    <h2 class="text-xl mb-3">Tokens committed to the graveyard: {{ committed }}</h2>
+    <h2 class="text-xl mb-3">Tokens committed to the graveyard: {{ committed.length }}</h2>
     <div class="flex flex-wrap items-center justify-center my-6">
       <Button v-if="stage === 1" class="m-2" @click="router.push({ name: 'whitelist' })">Whitelist</Button>
       <Button v-if="urnAddress" class="m-2" @click="addUrn">Add URN Token</Button>

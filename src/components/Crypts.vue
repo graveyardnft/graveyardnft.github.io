@@ -20,19 +20,15 @@
       </nav>
     </div>
     <div class="flex flex-wrap justify-center items-center">
-      <div
+      <Token
           v-for="token in paginated"
           :key="token.tokenId"
-          class="w-80 m-4 p-2 bg-slate-800 rounded border border-slate-900 shadow text-center"
-      >
-        <img
-            :src="(token.tokenMetadata?.image || 'logo.svg').replace('ipfs://', 'https://dweb.link/ipfs/')"
-            class="w-full h-auto mb-2"
-            :class="{ loading: token.loading }"
-            onerror="this.src='logo.svg';"
-        />
-        <div class="break-words">CRYPT #{{ token.tokenId }}</div>
-      </div>
+          tokenName="Graveyard CRYPTS"
+          tokenSymbol="CRYPT"
+          :tokenId="token.tokenId"
+          :metaData="token.tokenMetadata"
+          :loading="token.loading"
+      />
     </div>
   </div>
 </template>
@@ -42,6 +38,8 @@ import { computed, inject, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { debounce } from 'debounce'
+import { loadTokenURI } from '../utils'
+import Token from './Token.vue'
 import Button from './Button.vue'
 
 const route = useRoute()
@@ -86,38 +84,9 @@ const loadToken = async (event: object) => {
   if (event.loading || event.loaded) return
   event.loading = true
   try {
-    const rawTokenURI = await crypt.value.tokenURI(event.tokenId)
-    const tokenURI = `${rawTokenURI}`.replace('ipfs://', 'https://dweb.link/ipfs/')
-    // try three different request paths to cover as many cases as possible,
-    // but remember some of these are 100% rugs so we can't guarantee either will work
-    // first attempt uri, then try with no cors, finally try a different ipfs gateway
-    try {
-      event.tokenMetadata = await ethers.utils.fetchJson(tokenURI)
-    } catch (e) {
-      try {
-        const res = await fetch(
-            tokenURI,
-            {
-              mode: 'no-cors',
-              redirect: 'follow',
-              referrerPolicy: 'no-referrer',
-              headers: {
-                Accept: 'application/json'
-              }
-            }
-        )
-        event.tokenMetadata = await res.json()
-      } catch (e) {
-        if (rawTokenURI.includes('/ipfs/')) {
-          event.tokenMetadata = await ethers.utils.fetchJson(`https://cloudflare-ipfs.com/ipfs/${rawTokenURI.split('/ipfs/')[1]}`)
-        } else {
-          throw e
-        }
-      }
-    }
+    event.tokenMetadata = await loadTokenURI(await crypt.value.tokenURI(event.tokenId))
   } catch (e) {
     event.tokenMetadata = { failed: true }
-    console.error(e)
   }
   event.loading = false
   event.loaded = true

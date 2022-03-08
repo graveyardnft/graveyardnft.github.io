@@ -60,7 +60,7 @@ import { defineComponent, ref, computed, provide, onErrorCaptured, watchEffect }
 import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { CID } from 'multiformats/cid'
-import { getContract } from './utils'
+import { getContract, parseEvent } from './utils'
 import graveyardAbi from './graveyardAbi.json'
 import cryptAbi from './cryptAbi.json'
 import urnAbi from './urnAbi.json'
@@ -126,7 +126,7 @@ export default defineComponent({
     const maxSupply = ref(6969)
     const stage = ref(0)
     const minted = ref(0)
-    const committed = ref(0)
+    const committed = ref<object[]>([])
 
     let timeout: number
     provide('success', (msg: string) => {
@@ -198,10 +198,9 @@ export default defineComponent({
 
     const updateCommitted = async () => {
       const filter = graveyard.value.filters.Committed()
-      const events = await graveyard.value.queryFilter(filter)
-      committed.value = events.length;
-      graveyard.value.on(filter, () => {
-        committed.value++;
+      committed.value = (await graveyard.value.queryFilter(filter)).map(parseEvent)
+      graveyard.value.on(filter, event => {
+        committed.value.push(parseEvent(event))
       })
     }
 
