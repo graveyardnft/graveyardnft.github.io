@@ -173,7 +173,8 @@ export default defineComponent({
 
     const updateMinted = async () => {
       minted.value = (await crypt.value.totalSupply()).toNumber()
-      console.debug('minted', minted.value)
+      maxSupply.value = (await crypt.value.maxSupply()).toNumber()
+      console.debug('minted', minted.value, 'max', maxSupply.value)
     }
 
     const updateStage = async () => {

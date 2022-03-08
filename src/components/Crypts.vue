@@ -1,40 +1,148 @@
 <template>
-  <div v-if="stage >= 4" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
-    <div class="flex flex-wrap items-center justify-center">
-      <div class="m-4 p-8 bg-gray-600/90 rounded border-4 border-gray-700">
-        <h3 class="text-5xl text-center leading-snug text-slate-800">SOLD OUT</h3>
-        hello
-      </div>
-      <div class="m-4 p-8 bg-gray-600/90 rounded border-4 border-gray-700">
-        <h3 class="text-5xl text-center leading-snug text-slate-800">SOLD OUT</h3>
-        hello
-      </div>
-      <div class="m-4 p-8 bg-gray-600/90 rounded border-4 border-gray-700">
-        <h3 class="text-5xl text-center leading-snug text-slate-800">SOLD OUT</h3>
-        hello
+  <div class="container mx-auto px-4 md:px-0">
+    <div class="mb-4 py-7 border-b border-slate-500 flex items-center">
+      <input v-model="query" type="text" class="p-2 rounded border border-slate-900 bg-slate-800 text-sm placeholder:text-grey-100 outline-none" placeholder="Search" />
+      <a v-if="balance" href="#" @click.prevent="filterMyCrypts" class="inline-flex ml-4 bg-slate-800 rounded border border-slate-900 shadow items-center px-2 py-2 rounded-l-md text-sm hover:bg-slate-700">
+        My CRYPT's
+      </a>
+      <nav class="inline-flex bg-slate-800 rounded border border-slate-900 shadow ml-auto" aria-label="Pagination">
+        <a href="#" @click.prevent="prevPage" class="inline-flex items-center px-2 py-2 rounded-l-md text-sm hover:bg-slate-700">
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <span aria-current="page" class="inline-flex items-center px-4 py-2 border-l border-slate-900 text-sm">Page {{ page }} of {{ maxPage }} ({{ myCrypts.length || minted }})</span>
+        <a href="#" @click.prevent="nextPage" class="inline-flex items-center px-2 py-2 border-l border-slate-900 rounded-r-md text-sm hover:bg-slate-700">
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </nav>
+    </div>
+    <div class="flex flex-wrap justify-center items-center">
+      <div
+          v-for="token in paginated"
+          :key="token.tokenId"
+          class="w-80 m-4 p-2 bg-slate-800 rounded border border-slate-900 shadow text-center"
+      >
+        <img
+            :src="(token.tokenMetadata?.image || 'logo.svg').replace('ipfs://', 'https://dweb.link/ipfs/')"
+            class="w-full h-auto mb-2"
+            :class="{ loading: token.loading }"
+            onerror="this.src='logo.svg';"
+        />
+        <div class="break-words">CRYPT #{{ token.tokenId }}</div>
       </div>
     </div>
-  </div>
-  <div v-else class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
-    <h2 class="text-5xl">Viewing CRYPT's inactive.</h2>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watchEffect } from 'vue'
+import { computed, inject, ref, watch, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ethers } from 'ethers'
+import { debounce } from 'debounce'
 import Button from './Button.vue'
 
+const route = useRoute()
+const router = useRouter()
+
 const stage = inject<number>('stage')
-const contract = inject<ethers.Contract>('contract')
+const crypt = inject<ethers.Contract>('crypt')
+const cryptAddress = inject<string>('cryptAddress')
 const minted = inject<number>('minted')
+const maxSupply = inject<number>('maxSupply')
+const account = inject<string>('account')
+
 const tokens = ref<any[]>([])
+const balance = ref<number>(0)
+const myCrypts = ref<number[]>([])
 
-const loadTokens = (page: number) => {
+const query = ref<string>('')
+const page = computed<number>(() => parseInt(route?.query?.page || 1))
+const filtered = computed<object[]>(() => {
+  const t = (myCrypts.value.length) ? tokens.value.filter(token => myCrypts.value.includes(token.tokenId)) : tokens.value
+  const q = query.value
+  if (q === '') return t
 
+  return t.filter(token => `${token.tokenId}`.includes(q))
+})
+const paginated = computed<object[]>(() => filtered.value.slice((page.value - 1) * 20, page.value * 20))
+const maxPage = computed<number>(() => Math.ceil((query.value !== '' || myCrypts.value.length ? filtered.value.length : minted.value) / 20))
+
+const prevPage = () => {
+  if (page.value !== 1) {
+    router.replace({ query: { page: page.value - 1} })
+  }
 }
 
-watchEffect(() => {
-  // loadTokens(page)
+const nextPage = () => {
+  if (page.value !== maxPage.value) {
+    router.replace({ query: { page: page.value + 1 } })
+  }
+}
+
+const loadToken = async (event: object) => {
+  if (event.loading || event.loaded) return
+  event.loading = true
+  try {
+    const rawTokenURI = await crypt.value.tokenURI(event.tokenId)
+    const tokenURI = `${rawTokenURI}`.replace('ipfs://', 'https://dweb.link/ipfs/')
+    // try three different request paths to cover as many cases as possible,
+    // but remember some of these are 100% rugs so we can't guarantee either will work
+    // first attempt uri, then try with no cors, finally try a different ipfs gateway
+    try {
+      event.tokenMetadata = await ethers.utils.fetchJson(tokenURI)
+    } catch (e) {
+      try {
+        const res = await fetch(
+            tokenURI,
+            {
+              mode: 'no-cors',
+              redirect: 'follow',
+              referrerPolicy: 'no-referrer',
+              headers: {
+                Accept: 'application/json'
+              }
+            }
+        )
+        event.tokenMetadata = await res.json()
+      } catch (e) {
+        if (rawTokenURI.includes('/ipfs/')) {
+          event.tokenMetadata = await ethers.utils.fetchJson(`https://cloudflare-ipfs.com/ipfs/${rawTokenURI.split('/ipfs/')[1]}`)
+        } else {
+          throw e
+        }
+      }
+    }
+  } catch (e) {
+    event.tokenMetadata = { failed: true }
+    console.error(e)
+  }
+  event.loading = false
+  event.loaded = true
+}
+
+const filterMyCrypts = async () => {
+  if (myCrypts.value.length) {
+    myCrypts.value = []
+  } else {
+    const tokens = []
+    for (let i = 0; i < balance.value; i++) {
+      tokens.push((await crypt.value.tokenOfOwnerByIndex(account.value, i)).toNumber())
+    }
+    myCrypts.value = tokens
+  }
+}
+
+watch([() => query.value, () => myCrypts.value], () => router.replace({ query: { page: undefined } }))
+watch(() => paginated.value, debounce(() => {paginated.value.forEach(loadToken); console.log('triggered')}, 128))
+
+watchEffect(async () => {
+  balance.value = (await crypt.value.balanceOf(account.value)).toNumber()
+  for (let i = 0; i < minted.value; i++) {
+    if (tokens.value[i] && tokens.value[i].loaded) continue
+    tokens.value[i] = { tokenId: i + 1 }
+  }
 })
 </script>

@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, watchEffect } from 'vue'
+import { inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import Commit from './Commit.vue'
