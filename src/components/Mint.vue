@@ -1,5 +1,5 @@
 <template>
-  <div v-if="stage >= 3" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
+  <div v-if="stage === 3" class="container mx-auto pt-6 pb-32 md:pt-32 px-4 md:px-0 text-center">
     <Game>
       <div class="text-3xl md:text-5xl leading-snug mb-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
       <div class="flex flex-col w-96 max-w-full mx-auto p-8 bg-slate-900/90 rounded border-4 border-slate-900 text-grey-100">

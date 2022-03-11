@@ -14,7 +14,7 @@
         <div class="text-3xl md:text-5xl leading-snug my-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
         <div class="flex items-center justify-center">
           <Button v-if="stage === 2" class="mx-2" @click="router.push({ name: 'whitelist' })">Whitelist Mint</Button>
-          <Button v-else class="mx-2" @click="router.push({ name: 'mint' })">Mint</Button>
+          <Button v-else-if="stage === 3" class="mx-2" @click="router.push({ name: 'mint' })">Mint</Button>
         </div>
       </template>
     </div>
