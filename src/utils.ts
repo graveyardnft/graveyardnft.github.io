@@ -24,21 +24,22 @@ export const loadTokenURI = async (rawTokenURI: string) => {
     // but remember some of these are 100% rugs so we can't guarantee either will work
     // first attempt uri, then try with no cors, finally try a different ipfs gateway
     try {
-        return await ethers.utils.fetchJson(tokenURI)
+        const res = await fetch(
+            tokenURI,
+            {
+                mode: 'no-cors',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                headers: {
+                    Accept: 'application/json'
+                },
+                cache: 'force-cache'
+            }
+        )
+        return await res.json()
     } catch (e) {
         try {
-            const res = await fetch(
-                tokenURI,
-                {
-                    mode: 'no-cors',
-                    redirect: 'follow',
-                    referrerPolicy: 'no-referrer',
-                    headers: {
-                        Accept: 'application/json'
-                    }
-                }
-            )
-            return await res.json()
+            return await ethers.utils.fetchJson(tokenURI)
         } catch (e) {
             if (rawTokenURI.includes('/ipfs/')) {
                 return await ethers.utils.fetchJson(`https://cloudflare-ipfs.com/ipfs/${rawTokenURI.split('/ipfs/')[1]}`)
