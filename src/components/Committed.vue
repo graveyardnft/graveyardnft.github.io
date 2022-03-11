@@ -75,6 +75,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { debounce } from 'debounce'
 import { loadTokenURI } from '../utils'
+import contractCache from '../contractCache.json'
 import Token from './Token.vue'
 import Modal from './Modal.vue'
 import TokenImage from './TokenImage.vue'
@@ -97,8 +98,24 @@ const router = useRouter()
 const contract = inject<ethers.Contract>('contract')
 const committed = inject<object[]>('committed')
 
+const signer = new ethers.providers.Web3Provider((window as any).ethereum).getSigner()
+const getContract = address => new ethers.Contract(
+    address,
+    [
+      'function symbol() external view returns (string)',
+      'function name() external view returns (string)',
+      'function tokenURI(uint256) external view returns (string)'
+    ],
+    signer
+)
+
 const tokens = ref<object[]>([])
-const tokenContracts = ref<Record<string, object>>({})
+const tokenContracts = ref<Record<string, object>>(
+  Object.fromEntries(
+    Object.entries(contractCache)
+      .map(([address, data]) => ([ address, { ...data, contract: getContract(address) } ]))
+  )
+)
 const query = ref<string>('')
 const selectedToken = ref(null)
 const selectedTokenIndex = ref(0)
@@ -150,15 +167,7 @@ const nextToken = () => {
 
 const loadContract = (event: object) => {
   if (!tokenContracts.value.hasOwnProperty(event.contract)) {
-    const contract = new ethers.Contract(
-        event.contract,
-        [
-          'function symbol() external view returns (string)',
-          'function name() external view returns (string)',
-          'function tokenURI(uint256) external view returns (string)'
-        ],
-        new ethers.providers.Web3Provider((window as any).ethereum).getSigner()
-    )
+    const contract = getContract(event.contract)
     tokenContracts.value[event.contract] = {
       contract,
       symbol: '',
