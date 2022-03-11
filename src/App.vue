@@ -198,9 +198,9 @@ export default defineComponent({
 
     const updateCommitted = async () => {
       const filter = graveyard.value.filters.Committed()
-      committed.value = (await graveyard.value.queryFilter(filter)).map(parseEvent)
+      committed.value = (await graveyard.value.queryFilter(filter)).reverse().map(parseEvent)
       graveyard.value.on(filter, event => {
-        committed.value.push(parseEvent(event))
+        committed.value.unshift(parseEvent(event))
       })
     }
 

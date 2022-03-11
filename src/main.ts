@@ -22,7 +22,7 @@ const routes = [
     { path: '/whitelist', name: 'whitelist', component: Whitelist, meta: { web3: true } },
     { path: '/mint', name: 'mint', component: Mint, meta: { web3: true } },
     { path: '/committal', name: 'commit', component: CommitPage, meta: { web3: true } },
-    { path: '/committed', name: 'committed', component: Committed, meta: { web3: true } },
+    { path: '/committed', name: 'committed', component: Committed, meta: { web3: true }, props: route => ({ from: route.query.from, token: route.query.token }) },
     { path: '/crypts', name: 'crypts', component: Crypts, meta: { web3: true } },
     // { path: '/crypts/:tokenId(\\d+)', name: 'crypt', component: { render (): object { return h('div', ['crypt', this.$route.params.tokenId ]) } }, meta: { web3: true } },
     { path: '/:pathMatch(.*)', name: 'not-found', component: NotFound }

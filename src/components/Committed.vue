@@ -18,22 +18,41 @@
     </div>
     <div class="flex flex-wrap justify-center items-center">
       <Token
-          v-for="token in paginated"
+          v-for="(token, index) in paginated"
           :key="`${token.tokenId}:${token.contract}`"
           :tokenName="tokenContracts[token.contract]?.name"
           :tokenSymbol="tokenContracts[token.contract]?.symbol"
           :tokenId="token.tokenId"
           :metaData="token.tokenMetadata"
           :loading="token.loading"
-          @click="selectedToken = token"
+          @click="selectToken(token, index)"
       />
     </div>
     <Modal v-if="selectedToken" full @close="selectedToken = null">
-      <template #header>#{{ selectedToken.tokenId }} {{ tokenContracts[selectedToken.contract]?.name }}<template v-if="tokenContracts[selectedToken.contract]?.symbol"> ({{ tokenContracts[selectedToken.contract]?.symbol }})</template></template>
+      <template #header>
+        <div class="flex items-center">
+          <nav class="inline-flex bg-slate-800 rounded border border-slate-900 shadow mr-4" aria-label="Pagination">
+            <a href="#" @click.prevent="prevToken" class="inline-flex items-center px-1 py-1 rounded-l-md text-sm hover:bg-slate-700">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </a>
+            <a href="#" @click.prevent="nextToken" class="inline-flex items-center px-1 py-1 border-l border-slate-900 rounded-r-md text-sm hover:bg-slate-700">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </a>
+          </nav>
+          <span>#{{ selectedToken.tokenId }} {{ tokenContracts[selectedToken.contract]?.name }}<template v-if="tokenContracts[selectedToken.contract]?.symbol"> ({{ tokenContracts[selectedToken.contract]?.symbol }})</template></span>
+        </div>
+      </template>
       <div class="flex flex-col md:flex-row">
         <div class="w-full lg:w-1/2 md:pr-2">
           <TokenImage :src="selectedToken.tokenMetadata.image || 'logo.svg'" :grayscale="false" />
-          <span>{{ selectedToken.message }}</span>
+          <div class="text-center">{{ selectedToken.message }}</div>
+          <div class="mt-4 flex items-center justify-center">
+            <Button size="small" @click="router.push({ query: { token: selectedToken.contract } })">View more from this collection</Button>
+          </div>
         </div>
         <div class="w-full lg:w-1/2 md:pl-2">
           <div class="grid grid-cols-3 gap-4">
@@ -64,9 +83,14 @@ import { loadTokenURI } from '../utils'
 import Token from './Token.vue'
 import Modal from './Modal.vue'
 import TokenImage from './TokenImage.vue'
+import Button from './Button.vue'
 
 const props = defineProps({
   from: {
+    type: String,
+    default: null
+  },
+  token: {
     type: String,
     default: null
   }
@@ -81,6 +105,7 @@ const tokens = ref<object[]>([])
 const tokenContracts = ref<Record<string, object>>({})
 const query = ref<string>('')
 const selectedToken = ref(null)
+const selectedTokenIndex = ref(0)
 
 const page = computed<number>(() => parseInt(route?.query?.page || 1))
 const filtered = computed<object[]>(() => {
@@ -105,6 +130,25 @@ const prevPage = () => {
 const nextPage = () => {
   if (page.value !== maxPage.value) {
     router.replace({ query: { page: page.value + 1 } })
+  }
+}
+
+const selectToken = (token, index) => {
+  selectedToken.value = token
+  selectedTokenIndex.value = index
+}
+
+const prevToken = () => {
+  if (selectedTokenIndex.value > 0) {
+    selectedTokenIndex.value--
+    selectToken(paginated.value[selectedTokenIndex.value], selectedTokenIndex.value)
+  }
+}
+
+const nextToken = () => {
+  if (selectedTokenIndex.value < paginated.value.length) {
+    selectedTokenIndex.value++
+    selectToken(paginated.value[selectedTokenIndex.value], selectedTokenIndex.value)
   }
 }
 
@@ -148,7 +192,11 @@ watch(() => query.value, () => router.replace({ query: { page: undefined } }))
 watch(() => paginated.value, debounce(() => {paginated.value.forEach(loadToken); console.log('triggered')}, 128))
 
 watchEffect(() => {
-  tokens.value = (props.from ? committed.value.filter(e => e.from === props.from) : committed.value).map(e => loadContract(e))
+  let t = (props.from ? committed.value.filter(e => e.from.toLowerCase() === props.from.toLowerCase()) : committed.value)
+  if (props.token) {
+    t = t.filter(e => e.contract.toLowerCase() === props.token.toLowerCase())
+  }
+  tokens.value = t.map(e => loadContract(e))
 })
 </script>
 
