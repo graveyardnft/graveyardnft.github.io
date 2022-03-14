@@ -4,7 +4,7 @@
       class="w-80 m-4 p-2 bg-slate-800 rounded border border-slate-900 shadow text-center cursor-pointer"
   >
     <div v-if="tokenName" class="mb-2">{{ tokenName }}<template v-if="tokenSymbol"> ({{ tokenSymbol }})</template></div>
-    <TokenImage :src="metaData?.image || 'logo.svg'" :loading="loading" />
+    <TokenImage :src="metaData?.image || 'logo.svg'" :loading="loading" :grayscale="grayscale" />
     <div class="break-words">{{ metaData?.name || tokenId }}</div>
   </a>
 </template>
@@ -27,6 +27,10 @@ const props = defineProps({
   },
   metaData: {
     type: Object
+  },
+  grayscale: {
+    type: Boolean,
+    default: true
   }
 })
 
