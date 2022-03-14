@@ -3,21 +3,11 @@
     <div class="mb-4 py-7 border-b border-slate-500 flex items-center">
       <input v-model="query" type="text" class="p-2 rounded border border-slate-900 bg-slate-800 text-sm placeholder:text-grey-100 outline-none" placeholder="Search" />
       <a v-if="balance" href="#" @click.prevent="filterMyCrypts" class="inline-flex ml-4 bg-slate-800 rounded border border-slate-900 shadow items-center px-2 py-2 rounded-l-md text-sm hover:bg-slate-700">
-        My CRYPT's
+        {{ myCrypts.length ? 'All CRYPT\'s' : 'My CRYPT\'s' }}
       </a>
-      <nav class="inline-flex bg-slate-800 rounded border border-slate-900 shadow ml-auto" aria-label="Pagination">
-        <a href="#" @click.prevent="prevPage" class="inline-flex items-center px-2 py-2 rounded-l-md text-sm hover:bg-slate-700">
-          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-          </svg>
-        </a>
-        <span aria-current="page" class="inline-flex items-center px-4 py-2 border-l border-slate-900 text-sm">Page {{ page }} of {{ maxPage }} ({{ myCrypts.length || minted }})</span>
-        <a href="#" @click.prevent="nextPage" class="inline-flex items-center px-2 py-2 border-l border-slate-900 rounded-r-md text-sm hover:bg-slate-700">
-          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-          </svg>
-        </a>
-      </nav>
+      <Pagination @prev="prevPage" @next="nextPage">
+        Page {{ page }} of {{ maxPage }} ({{ myCrypts.length || minted }})
+      </Pagination>
     </div>
     <div class="flex flex-wrap justify-center items-center">
       <Token
@@ -30,6 +20,11 @@
           :loading="token.loading"
       />
     </div>
+    <div class="my-4 py-7 border-t border-slate-500 flex items-center">
+      <Pagination @prev="prevPage" @next="nextPage">
+        Page {{ page }} of {{ maxPage }} ({{ myCrypts.length || minted }})
+      </Pagination>
+    </div>
   </div>
 </template>
 
@@ -41,6 +36,7 @@ import { debounce } from 'debounce'
 import { loadTokenURI } from '../utils'
 import Token from './Token.vue'
 import Button from './Button.vue'
+import Pagination from './Pagination.vue'
 
 const route = useRoute()
 const router = useRouter()
