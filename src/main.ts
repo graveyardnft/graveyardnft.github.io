@@ -19,8 +19,8 @@ if (typeof window !== 'undefined') window.global = window;
 const routes = [
     { path: '/', name: 'home', component: Homepage, meta: { web3: true } },
     { path: '/last-rites', name: 'last-rites', component: LastRites },
-    { path: '/whitelist', name: 'whitelist', component: Whitelist, meta: { web3: true } },
-    { path: '/mint', name: 'mint', component: Mint, meta: { web3: true } },
+    // { path: '/whitelist', name: 'whitelist', component: Whitelist, meta: { web3: true } },
+    // { path: '/mint', name: 'mint', component: Mint, meta: { web3: true } },
     { path: '/committal', name: 'commit', component: CommitPage, meta: { web3: true } },
     { path: '/committed', name: 'committed', component: Committed, meta: { web3: true }, props: route => ({ from: route.query.from, token: route.query.token }) },
     { path: '/crypts', name: 'crypts', component: Crypts, meta: { web3: true } },

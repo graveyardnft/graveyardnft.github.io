@@ -3,20 +3,10 @@
     <h1 class="text-3xl md:text-5xl leading-snug mb-4">The Graveyard NFT project is the final resting place for your unsuccessful NFTs on the Ethereum blockchain.</h1>
     <h2 class="text-xl mb-3">Tokens committed to the graveyard: {{ committed.length }}</h2>
     <div class="flex flex-wrap items-center justify-center my-6">
-      <Button v-if="stage === 1" class="m-2" @click="router.push({ name: 'whitelist' })">Whitelist</Button>
       <Button v-if="urnAddress" class="m-2" @click="addUrn">Add URN Token</Button>
-      <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'commit' })">Committal</Button>
-<!--      <Button v-if="stage >= 4" class="m-2" @click="router.push({ name: 'crypts' })">View CRYPT's</Button>-->
-    </div>
-    <div v-if="stage >= 2 && minted <= maxSupply">
-      <div v-if="minted === maxSupply" class="text-3xl leading-snug my8 text-center">Sold Out</div>
-      <template v-else>
-        <div class="text-3xl md:text-5xl leading-snug my-8 text-center">{{ minted }}/{{ maxSupply }} Minted</div>
-        <div class="flex items-center justify-center">
-          <Button v-if="stage === 2" class="mx-2" @click="router.push({ name: 'whitelist' })">Whitelist Mint</Button>
-          <Button v-else-if="stage === 3" class="mx-2" @click="router.push({ name: 'mint' })">Mint</Button>
-        </div>
-      </template>
+<!--      <Button class="m-2" @click="router.push({ name: 'commit' })">Committal</Button>-->
+      <Button class="m-2" @click="router.push({ name: 'crypts' })">View CRYPT's</Button>
+      <Button class="m-2" @click="router.push({ name: 'committed' })">View Graveyard</Button>
     </div>
   </div>
 </template>

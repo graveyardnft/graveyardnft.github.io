@@ -127,7 +127,7 @@ const commit = async (contractAddress: string, tokenId: number, data: string) =>
 const reset = () => {
   committing.value = false
   transaction.value = null
-  receipt.value = null;
+  receipt.value = null
 }
 
 const loadToken = async () => {
