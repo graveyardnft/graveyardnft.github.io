@@ -36,7 +36,9 @@ export const loadTokenURI = async (rawTokenURI: string) => {
                 cache: 'force-cache'
             }
         )
-        return await res.json()
+        // burned mice fix
+        const text = await res.text()
+        return JSON.parse(text.replace('}{', '},{'))
     } catch (e) {
         try {
             return await ethers.utils.fetchJson(tokenURI)
