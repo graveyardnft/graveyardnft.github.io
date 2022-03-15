@@ -5,7 +5,7 @@
     <div class="flex flex-col items-center justify-center my-6">
       <Button v-if="urnAddress" class="m-2" @click="addUrn">Add URN Token</Button>
       <Button class="m-2" @click="router.push({ name: 'committed' })">View Graveyard</Button>
-      <Button class="m-2" @click="router.push({ name: 'commit' })">Sarifice</Button>
+      <Button class="m-2" @click="router.push({ name: 'commit' })">Sacrifice</Button>
     </div>
   </div>
 </template>
