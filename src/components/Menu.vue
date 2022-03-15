@@ -5,9 +5,9 @@
       Graveyard NFT
     </a>
     <div class="flex items-center justify-center py-4 md:py-0">
-      <a href="#" @click.prevent="router.push({ name: 'last-rites' })" class="md:ml-8">Whitepaper</a>
-      <a href="#" @click.prevent="router.push({ name: 'crypts' })" class="ml-8">$CRYPT</a>
+      <a href="#" @click.prevent="router.push({ name: 'crypts' })" class="md:ml-8">$CRYPT</a>
       <a href="#" @click.prevent="router.push({ name: 'urn' })" class="ml-8">$URN</a>
+      <a href="#" @click.prevent="router.push({ name: 'last-rites' })" class="ml-8">Whitepaper</a>
     </div>
     <div class="md:ml-auto flex items-center justify-center mt-4 md:mt-0">
       <a href="https://twitter.com/Graveyard_NFT_" target="_blank" rel="noopener" title="Twitter">

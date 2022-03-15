@@ -1,7 +1,15 @@
 <template>
   <div class="container mx-auto px-4 md:px-0">
-    <div class="mb-4 py-7 border-b border-slate-500 flex items-center">
-      <input v-model="query" type="text" class="p-2 rounded border border-slate-900 bg-slate-800 text-sm placeholder:text-grey-100 outline-none" placeholder="Search" />
+    <div class="py-7 border-b border-slate-500 flex flex-col md:flex-row items-center">
+      <input v-model="query" type="text" class="mb-4 p-2 rounded border border-slate-900 bg-slate-800 text-sm placeholder:text-grey-100 outline-none" placeholder="Search" />
+      <a
+          v-if="props.token"
+          href="#"
+          class="mb-4 md:ml-4 inline-flex items-center px-2 py-2 bg-slate-800 rounded border border-slate-900 shadow text-sm hover:bg-slate-700"
+          @click.prevent="router.replace({ query: { token: undefined } })"
+      >
+        Clear Collection Filter
+      </a>
       <Pagination @prev="prevPage" @next="nextPage">
         Page {{ page }} of {{ maxPage }} ({{ committed.length }})
       </Pagination>
