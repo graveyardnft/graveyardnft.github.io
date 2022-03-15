@@ -46,8 +46,17 @@
         </div>
       </template>
       <div class="flex flex-col md:flex-row">
-        <div class="w-full lg:w-1/2 md:pr-2">
+        <div class="w-full lg:w-1/2 md:pr-2 relative">
           <TokenImage :src="selectedToken.tokenMetadata.image || 'logo.svg'" :grayscale="false" />
+          <a
+              href="#"
+              class="absolute top-0 right-0 mt-4 mr-5 p-2 rounded-full bg-gray-200 text-slate-700 hover:bg-white hover:text-slate-900"
+              @click.prevent="download(selectedToken.tokenMetadata.image, selectedToken.tokenMetadata?.name)"
+          >
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17,13L12,18L7,13H10V9H14V13M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z" />
+            </svg>
+          </a>
         </div>
         <div class="w-full lg:w-1/2 md:pl-2">
           <div class="grid grid-cols-3 gap-4">
@@ -162,6 +171,26 @@ const nextToken = () => {
     selectedTokenIndex.value++
     selectToken(paginated.value[selectedTokenIndex.value], selectedTokenIndex.value)
   }
+}
+
+const download = (svg, name) => {
+  let img = document.createElement('img')
+  img.onload = () => {
+    document.body.appendChild(img)
+    const canvas = document.createElement('canvas')
+    const ratio = (img.clientWidth / img.clientHeight) || 1
+    document.body.removeChild(img)
+    canvas.width = 2400
+    canvas.height = 2400 / ratio
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    const data = canvas.toDataURL('image/png')
+    const link = document.createElement('a')
+    link.href = data
+    link.download = `${name.replace(' ', '-')}.png`
+    link.click()
+  }
+  img.src = svg
 }
 
 watch([() => query.value, () => myCrypts.value], () => router.replace({ query: { page: undefined } }))
