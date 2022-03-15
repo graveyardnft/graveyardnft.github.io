@@ -23,7 +23,8 @@
     "tsc": "vue-tsc --noEmit",
     "build": "vite build",
     "preview": "vite preview",
-    "cid": "node cid"
+    "cid": "node cid",
+    "cache": "node cache.js"
   },
   "dependencies": {
     "debounce": "^1.2.1",

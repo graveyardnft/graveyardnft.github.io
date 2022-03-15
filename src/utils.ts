@@ -6,6 +6,18 @@ export const getContract = (address: string, abi: any[]) => new ethers.Contract(
     new ethers.providers.Web3Provider((window as any).ethereum).getSigner()
 )
 
+export const parseCachedEvent = (event: any[]) => {
+    return {
+        contract: event[0],
+        from: event[1],
+        message: ethers.utils.toUtf8String(event[2]).replace(`\u0000`, ''),
+        tokenId: event[3],
+        tokenMetadata: { name: '', image: '/logo.svg' },
+        loading: false,
+        loaded: false
+    }
+}
+
 export const parseEvent = (event: object) => {
     return {
         contract: event.args.contractAddress,

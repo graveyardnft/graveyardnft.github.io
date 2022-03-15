@@ -113,7 +113,7 @@ const tokens = ref<object[]>([])
 const tokenContracts = ref<Record<string, object>>(
   Object.fromEntries(
     Object.entries(contractCache)
-      .map(([address, data]) => ([ address, { ...data, contract: getContract(address) } ]))
+      .map(([address, data]) => ([ address, { symbol: data[0], name: data[1], contract: getContract(address) } ]))
   )
 )
 const query = ref<string>('')

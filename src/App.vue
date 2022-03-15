@@ -10,7 +10,7 @@
         <h2 class="text-md">Join our discord to stay up to date on news and announcements.</h2>
         <div class="flex items-center justify-center my-8">
           <Button class="mx-2" @click="connect()">Connect</button>
-          <Button class="mx-2" @click="router.push({ name: 'last-rites' })">Last Rites</Button>
+          <Button class="mx-2" @click="router.push({ name: 'last-rites' })">Whitepaper</Button>
         </div>
       </div>
       <router-view v-else />
@@ -60,7 +60,7 @@ import { defineComponent, ref, computed, provide, onErrorCaptured, watchEffect }
 import { useRouter } from 'vue-router'
 import { ethers } from 'ethers'
 import { CID } from 'multiformats/cid'
-import { getContract, parseEvent } from './utils'
+import { getContract, parseEvent, parseCachedEvent } from './utils'
 import graveyardAbi from './graveyardAbi.json'
 import cryptAbi from './cryptAbi.json'
 import urnAbi from './urnAbi.json'
@@ -197,8 +197,12 @@ export default defineComponent({
     }
 
     const updateCommitted = async () => {
+      const cached = await import('./eventCache.json')
       const filter = graveyard.value.filters.Committed()
-      committed.value = (await graveyard.value.queryFilter(filter)).reverse().map(parseEvent)
+      committed.value = [
+        ...(await graveyard.value.queryFilter(filter, cached.blockNumber + 1)).reverse().map(parseEvent),
+        ...cached.events.reverse().map(parseCachedEvent)
+      ]
       graveyard.value.on(filter, event => {
         committed.value.unshift(parseEvent(event))
       })
