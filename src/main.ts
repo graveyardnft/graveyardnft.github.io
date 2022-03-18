@@ -40,7 +40,7 @@ createApp(App, {
     looksRare: 'https://looksrare.org/collections/0xda5e043e57d54dbEB0e2BB917cCeB629512c969A',
     graveyardAddresses: { 1: '0xB96C44c007B2cf979cC30fD6650bEd39823c8BE5', 4: '0x86D1239bfd0Df429Ed6d99Ce3E998E34827F7622' },
     cryptAddresses: { 1: '0xda5e043e57d54dbEB0e2BB917cCeB629512c969A', 4: '0x39f494b21e48a8d6e4648D916038308FA8489C06' },
-    urnAddresses: { 1: null, 4: '0x2325EA6B9fF882Bb855F92749a8E2B13daE7c409' }
+    urnAddresses: { 1: '0xe4520f883c7760BFb35071463346C5eafbb25622', 4: '0x2325EA6B9fF882Bb855F92749a8E2B13daE7c409' }
 })
 .use(router)
 .mount('#app')
