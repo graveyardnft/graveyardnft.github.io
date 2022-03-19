@@ -4,16 +4,27 @@
     <h2 class="md:text-xl leading-snug mb-8">$URN may be used/burnt for future benefits outside of the promised utility of $CRYPT’s either directly by the project or through partnerships.</h2>
     <h2 class="text-xl mb-3">Your daily $URN reward rate: {{ rewardRate }}</h2>
     <h2 class="text-xl mb-8">Your pending $URN rewards: {{ rewards }}</h2>
-    <Button size="small" @click="addUrn">Add URN to MetaMask</Button>
+    <Button size="small" class="mr-4" @click="addUrn">Add URN to MetaMask</Button>
+    <Button size="small" @click="claim">Claim $URN</Button>
     <h2 class="text-md mt-8 mb-3">$URN Total Supply: {{ urnSupply }}</h2>
     <h4 class="text-md">$URN Contract Address: {{ urnAddress }}</h4>
   </div>
+  <Modal v-if="claiming" @close="reset">
+    <template #header>
+      Claiming $URN
+    </template>
+    <div class="flex items-center justify-center my-4">
+      <Transaction :transaction="transaction" :receipt="receipt" />
+    </div>
+  </Modal>
 </template>
 
 <script setup lang="ts">
 import { inject, ref } from 'vue'
 import { ethers } from 'ethers'
 import Button from './Button.vue'
+import Transaction from './Transaction.vue'
+import Modal from './Modal.vue'
 
 const graveyard = inject('contract')
 const crypt = inject('crypt')
@@ -21,10 +32,15 @@ const account = inject('account')
 const web3 = inject('web3')
 const urn = inject<ethers.Contract>('urn')
 const urnAddress = inject<string>('urnAddress')
+const success = inject<(msg: string) => {}>('success')
 
 const rewards = ref(0)
 const rewardRate = ref(0)
 const urnSupply = ref(0)
+
+const transaction = ref(null)
+const receipt = ref(null)
+const claiming = ref(false)
 
 const addUrn = async () => {
   const symbol = await urn.value.symbol()
@@ -43,6 +59,33 @@ const addUrn = async () => {
     },
   })
   console.debug('URN', added, urnAddress, symbol, decimals);
+}
+
+const claim = async () => {
+  claiming.value = true
+  transaction.value = null
+  receipt.value = null
+  try {
+    transaction.value = await graveyard.value.claim()
+  } catch (e) {
+    reset()
+    throw e
+  }
+  console.debug('transaction', transaction.value)
+  receipt.value = await transaction.value.wait()
+  console.debug('receipt', receipt.value)
+  if (receipt.value.status !== 1) throw new Error('Transaction Reverted!')
+  success(`Claim successful.`)
+  updateUrn()
+  setTimeout(() => {
+    claiming.value = false
+  }, 5000)
+}
+
+const reset = () => {
+  claiming.value = false
+  transaction.value = null
+  receipt.value = null
 }
 
 const updateUrn = async () => {
